@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Screens · Haven London</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Darumadrop+One&family=Doto:wght@700;900&family=Jua&display=swap"
+    />
+    <link rel="stylesheet" href="/brand.css" />
+    <link rel="stylesheet" href="/control.css" />
+  </head>
+  <body>
+    <header class="top">
+      <h1>Haven London <span>screens</span></h1>
+      <p class="status" id="status" data-state="connecting">Connecting…</p>
+      <div class="top-actions">
+        <a class="button ghost" href="/" target="_blank" rel="noopener">Open screen</a>
+        <button class="button ghost" type="button" id="reloadScreens">Refresh screens</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <div class="column sticky">
+        <section class="panel">
+          <div class="preview" id="preview">
+            <iframe src="/?preview" title="Live preview" tabindex="-1"></iframe>
+          </div>
+          <h2>On screen now</h2>
+          <div class="scenes" id="scenes">
+            <button type="button" data-scene="idle">Clock</button>
+            <button type="button" data-scene="schedule">Schedule</button>
+            <button type="button" data-scene="countdown">Countdown</button>
+            <button type="button" data-scene="message">Message</button>
+            <button type="button" data-scene="embed">Website</button>
+            <button type="button" data-scene="rotate">Rotation</button>
+          </div>
+        </section>
+
+        <form class="panel flash" id="alertForm">
+          <h2>Flash announcement</h2>
+          <p class="hint">Takes over every screen, then returns to whatever was showing.</p>
+          <label>Title <input name="title" maxlength="200" placeholder="Lunch is ready" /></label>
+          <label>Message <textarea name="body" rows="2" maxlength="600" placeholder="Pizza in the main hall."></textarea></label>
+          <div class="row">
+            <label
+              >Show for
+              <select name="seconds">
+                <option value="15">15 seconds</option>
+                <option value="30" selected>30 seconds</option>
+                <option value="60">1 minute</option>
+                <option value="300">5 minutes</option>
+                <option value="0">Until I clear it</option>
+              </select>
+            </label>
+            <fieldset class="tones">
+              <legend>Colour</legend>
+              <label class="tone-orange"><input type="radio" name="tone" value="orange" checked /><span>Orange</span></label>
+              <label class="tone-green"><input type="radio" name="tone" value="green" /><span>Green</span></label>
+              <label class="tone-teal"><input type="radio" name="tone" value="teal" /><span>Teal</span></label>
+              <label class="tone-yellow"><input type="radio" name="tone" value="yellow" /><span>Yellow</span></label>
+              <label class="tone-red"><input type="radio" name="tone" value="red" /><span>Red</span></label>
+            </fieldset>
+          </div>
+          <div class="actions">
+            <button class="button" type="submit">Send to screens</button>
+            <button class="button ghost" type="button" id="clearAlert" hidden>Clear announcement</button>
+          </div>
+        </form>
+
+        <form class="panel" data-section="ticker">
+          <h2>Ticker</h2>
+          <p class="hint">A scrolling strip along the bottom of every scene.</p>
+          <label>Text <input data-field="text" maxlength="500" placeholder="Wi-Fi: … · Need help? Find an organiser in an orange lanyard" /></label>
+          <label class="check"><input type="checkbox" data-field="enabled" /> Show the ticker</label>
+          <div class="actions"><button class="button" type="submit">Save</button></div>
+        </form>
+      </div>
+
+      <div class="column">
+        <form class="panel" data-section="idle">
+          <h2>Clock <small>shown when nothing else is on</small></h2>
+          <label>Welcome line <input data-field="message" maxlength="200" /></label>
+          <label class="check"><input type="checkbox" data-field="showNext" /> Show what's next on the schedule</label>
+          <label class="check"><input type="checkbox" data-field="stickers" /> Stickers and hedgehog</label>
+          <div class="actions">
+            <button class="button" type="submit">Save</button>
+            <button class="button ghost" type="submit" data-show="idle">Save &amp; show</button>
+          </div>
+        </form>
+
+        <form class="panel" data-section="message">
+          <h2>Message <small>stays up until you change scene</small></h2>
+          <label>Label <input data-field="kicker" maxlength="60" /></label>
+          <label>Title <input data-field="title" maxlength="200" /></label>
+          <label>Message <textarea data-field="body" rows="3" maxlength="600"></textarea></label>
+          <fieldset class="tones">
+            <legend>Colour</legend>
+            <label class="tone-orange"><input type="radio" name="message-tone" data-field="tone" value="orange" /><span>Orange</span></label>
+            <label class="tone-green"><input type="radio" name="message-tone" data-field="tone" value="green" /><span>Green</span></label>
+            <label class="tone-teal"><input type="radio" name="message-tone" data-field="tone" value="teal" /><span>Teal</span></label>
+            <label class="tone-yellow"><input type="radio" name="message-tone" data-field="tone" value="yellow" /><span>Yellow</span></label>
+            <label class="tone-red"><input type="radio" name="message-tone" data-field="tone" value="red" /><span>Red</span></label>
+          </fieldset>
+          <div class="actions">
+            <button class="button" type="submit">Save</button>
+            <button class="button ghost" type="submit" data-show="message">Save &amp; show</button>
+          </div>
+        </form>
+
+        <form class="panel" data-section="countdown">
+          <h2>Countdown</h2>
+          <label>Heading <input data-field="label" maxlength="120" /></label>
+          <label>Counts down to <input type="datetime-local" id="countdownTarget" step="1" /></label>
+          <div class="quick" id="quick">
+            <span>or from now:</span>
+            <button type="button" data-minutes="5">5 min</button>
+            <button type="button" data-minutes="10">10 min</button>
+            <button type="button" data-minutes="15">15 min</button>
+            <button type="button" data-minutes="30">30 min</button>
+            <button type="button" data-minutes="60">1 hour</button>
+          </div>
+          <label>When it reaches zero, say <input data-field="doneText" maxlength="120" /></label>
+          <div class="actions">
+            <button class="button" type="submit">Save</button>
+            <button class="button ghost" type="submit" data-show="countdown">Save &amp; show</button>
+          </div>
+        </form>
+
+        <form class="panel" data-section="schedule">
+          <h2>Schedule</h2>
+          <div class="row">
+            <label>Board name <input data-field="title" maxlength="60" /></label>
+            <label>Right-hand label <input data-field="platform" maxlength="60" /></label>
+          </div>
+          <p class="hint">Times are 24-hour, like 13:00. The screens mark what's on now and what's next by themselves.</p>
+          <ol class="items" id="items"></ol>
+          <button class="button ghost small" type="button" id="addItem">Add a row</button>
+          <div class="actions">
+            <button class="button" type="submit">Save</button>
+            <button class="button ghost" type="submit" data-show="schedule">Save &amp; show</button>
+          </div>
+        </form>
+
+        <form class="panel" data-section="embed">
+          <h2>Website</h2>
+          <label>Address <input data-field="url" inputmode="url" placeholder="https://…" maxlength="2000" /></label>
+          <p class="hint">Some sites refuse to be shown inside another page. Check the preview before relying on one.</p>
+          <label class="check"><input type="checkbox" data-field="showClock" /> Keep the clock in the corner</label>
+          <div class="actions">
+            <button class="button" type="submit">Save</button>
+            <button class="button ghost" type="submit" data-show="embed">Save &amp; show</button>
+          </div>
+        </form>
+
+        <form class="panel" data-section="rotate">
+          <h2>Rotation <small>cycles through scenes by itself</small></h2>
+          <fieldset class="checks" id="rotateScenes">
+            <legend>Include</legend>
+            <label class="check"><input type="checkbox" value="idle" /> Clock</label>
+            <label class="check"><input type="checkbox" value="schedule" /> Schedule</label>
+            <label class="check"><input type="checkbox" value="countdown" /> Countdown</label>
+            <label class="check"><input type="checkbox" value="message" /> Message</label>
+            <label class="check"><input type="checkbox" value="embed" /> Website</label>
+          </fieldset>
+          <label>Seconds on each <input type="number" data-field="seconds" min="5" max="3600" /></label>
+          <div class="actions">
+            <button class="button" type="submit">Save</button>
+            <button class="button ghost" type="submit" data-show="rotate">Save &amp; show</button>
+          </div>
+        </form>
+
+        <section class="panel danger">
+          <h2>Start over</h2>
+          <p class="hint">Puts every scene back to how it was before anyone changed anything.</p>
+          <button class="button ghost" type="button" id="reset">Reset everything</button>
+        </section>
+      </div>
+    </main>
+
+    <form class="login" id="login" hidden>
+      <div class="panel">
+        <h2>Organisers only</h2>
+        <label>Passcode <input type="password" name="passcode" autocomplete="current-password" required /></label>
+        <p class="error" id="loginError" hidden>That passcode isn't right.</p>
+        <button class="button" type="submit">Unlock</button>
+      </div>
+    </form>
+
+    <p class="toast" id="toast" role="status" hidden></p>
+
+    <template id="itemTemplate">
+      <li>
+        <input class="time" aria-label="Time" placeholder="9:00" maxlength="5" />
+        <input class="title" aria-label="What's happening" placeholder="What's happening" maxlength="120" />
+        <input class="detail" aria-label="Extra detail" placeholder="Extra detail (optional)" maxlength="200" />
+        <button type="button" class="remove" aria-label="Remove this row">×</button>
+      </li>
+    </template>
+
+    <script type="module" src="/control.js"></script>
+  </body>
+</html>

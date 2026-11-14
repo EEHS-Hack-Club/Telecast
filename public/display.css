@@ -1,0 +1,755 @@
+/*
+ * Built for a 16:9 screen across a room. 1rem is 16px on a 1920×1080 panel and scales with the
+ * screen, so every size below is in rem and the layout is identical on a 720p projector or a 4K TV.
+ */
+html {
+  font-size: min(0.83333vw, 1.48148vh);
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--haven-night);
+  font-family: var(--font-body);
+  color: var(--haven-cream);
+  cursor: none;
+}
+
+p,
+h1,
+h2 {
+  margin: 0;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+#stage {
+  --ticker-h: 0rem;
+  position: fixed;
+  inset: 0;
+  width: 120rem;
+  height: 67.5rem;
+  margin: auto;
+  overflow: hidden;
+}
+
+#stage.has-ticker {
+  --ticker-h: 5rem;
+}
+
+/* ---------- backdrop ---------- */
+
+.bg {
+  position: absolute;
+  inset: -3%;
+  background:
+    radial-gradient(ellipse at 50% 45%, transparent 35%, rgb(107 52 20 / 0.45) 100%),
+    url("/assets/hero-bg-no-sticky-tree.webp") center / cover;
+  animation: drift 60s ease-in-out infinite alternate;
+}
+
+/* Text-heavy scenes get a darker wash so words stay readable from the back of the hall. */
+.bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(60 26 6 / 0.5);
+  opacity: 0;
+  transition: opacity 0.8s;
+}
+
+#stage:is([data-scene="schedule"], [data-scene="countdown"], [data-scene="message"]) .bg::after {
+  opacity: 1;
+}
+
+@keyframes drift {
+  from {
+    transform: scale(1) translate(0, 0);
+  }
+  to {
+    transform: scale(1.06) translate(-1%, 1%);
+  }
+}
+
+.leaves {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.leaf {
+  position: absolute;
+  top: -4rem;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  background: var(--colour);
+  border-radius: 0 85% 0 85%;
+  opacity: 0.85;
+  animation: fall var(--dur) linear var(--delay) infinite;
+}
+
+@keyframes fall {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(calc(var(--sway) * 1), 18rem) rotate(calc(var(--spin) * 0.25));
+  }
+  50% {
+    transform: translate(calc(var(--sway) * -0.6), 36rem) rotate(calc(var(--spin) * 0.5));
+  }
+  75% {
+    transform: translate(calc(var(--sway) * 0.8), 54rem) rotate(calc(var(--spin) * 0.75));
+  }
+  100% {
+    transform: translate(0, 74rem) rotate(var(--spin));
+  }
+}
+
+/* ---------- scenes ---------- */
+
+.scene {
+  position: absolute;
+  inset: 0;
+  padding: 9rem 6rem calc(3.5rem + var(--ticker-h));
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.97);
+  transition:
+    opacity 0.5s,
+    transform 0.6s var(--ease-bounce),
+    visibility 0s 0.5s;
+}
+
+.scene.active {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.5s 0.15s,
+    transform 0.6s var(--ease-bounce) 0.15s;
+}
+
+/* Digits sit in fixed cells so the hand-drawn face doesn't wobble as the seconds change. */
+.clock {
+  display: flex;
+  justify-content: center;
+  font-family: var(--font-display);
+  line-height: 0.9;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.clock .d {
+  width: 0.54em;
+  text-align: center;
+}
+
+.clock .c {
+  width: 0.3em;
+  text-align: center;
+}
+
+.clock .c.blink {
+  animation: colon 2s steps(1) infinite;
+}
+
+@keyframes colon {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.sign {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.6rem 1.8rem 0.6rem 0.9rem;
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 0.35rem 0 rgb(0 0 0 / 0.18);
+  color: var(--haven-bark);
+  font-size: 2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  rotate: -2deg;
+}
+
+.roundel {
+  width: 3.6rem;
+  height: auto;
+  flex: none;
+}
+
+/* ---------- idle ---------- */
+
+.idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2.5rem;
+  padding-bottom: calc(2.5rem + var(--ticker-h));
+  text-align: center;
+}
+
+.idle-logo {
+  height: 15rem;
+  width: auto;
+  filter: drop-shadow(0 0.4rem 0 rgb(107 52 20 / 0.55));
+  animation: bob 7s ease-in-out infinite;
+}
+
+.idle-clock {
+  margin-top: -1rem;
+  font-size: 24rem;
+  color: var(--haven-cream);
+  text-shadow:
+    0 0.05em 0 var(--haven-bark),
+    0 0.1em 0.25em rgb(60 26 6 / 0.45);
+}
+
+.idle-date {
+  margin-top: 1.4rem;
+  font-size: 3.2rem;
+  text-shadow: 0 0.2rem 0 rgb(107 52 20 / 0.7);
+}
+
+.idle-message {
+  margin-top: 0.6rem;
+  max-width: 80rem;
+  font-family: var(--font-display);
+  font-size: 4.6rem;
+  line-height: 1;
+  color: var(--haven-butter);
+  text-shadow: 0 0.25rem 0 rgb(107 52 20 / 0.8);
+  text-wrap: balance;
+}
+
+.idle-next {
+  margin-top: 2rem;
+  max-width: 70rem;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 2.4rem;
+  white-space: nowrap;
+}
+
+.idle-next .sign-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--haven-orange-deep);
+}
+
+.idle-next b {
+  font-family: var(--font-board);
+  font-weight: 900;
+}
+
+.idle-next #idleNextTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stickers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.stickers.off {
+  display: none;
+}
+
+.sticker {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--w);
+  rotate: var(--tilt);
+  animation: bob var(--dur) ease-in-out var(--delay) infinite;
+}
+
+.sticker img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0.5rem 0.6rem rgb(60 26 6 / 0.35));
+  transition: transform 0.5s var(--ease-bounce);
+}
+
+.sticker.out img {
+  transform: scale(0) rotate(-40deg);
+  transition: transform 0.3s ease-in;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(-0.9rem) rotate(-2.5deg);
+  }
+  50% {
+    transform: translateY(0.9rem) rotate(2.5deg);
+  }
+}
+
+/* The hedgehog art is cropped at the waist, so it peeks over the bottom edge of the screen. */
+.hedgehog {
+  position: absolute;
+  bottom: var(--ticker-h);
+  left: 30%;
+  width: 17rem;
+  transform: translateY(105%);
+  animation: peek 16s ease-in-out 3s infinite;
+}
+
+@keyframes peek {
+  0%,
+  100% {
+    transform: translateY(105%) rotate(0deg);
+  }
+  8%,
+  30% {
+    transform: translateY(8%) rotate(-3deg);
+  }
+  19% {
+    transform: translateY(4%) rotate(4deg);
+  }
+  40% {
+    transform: translateY(105%) rotate(0deg);
+  }
+}
+
+/* ---------- schedule ---------- */
+
+.schedule {
+  display: grid;
+  grid-template-columns: 36rem 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.schedule h2 {
+  margin-top: 1.6rem;
+  font-size: 9rem;
+  text-shadow: 0 0.4rem 0 var(--haven-bark);
+}
+
+.now-card {
+  margin-top: 3rem;
+  padding: 2.2rem 2.4rem;
+  background: var(--haven-cream);
+  border-radius: 2rem;
+  box-shadow: 0 0.6rem 0 var(--haven-brown-dark);
+  color: var(--haven-bark);
+  rotate: 1deg;
+}
+
+.now-label {
+  font-size: 1.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--haven-orange-deep);
+}
+
+.now-title {
+  margin-top: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 4.4rem;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.now-next {
+  margin-top: 1.4rem;
+  padding-top: 1.2rem;
+  border-top: 0.2rem dashed rgb(107 52 20 / 0.25);
+  font-size: 2.1rem;
+  line-height: 1.25;
+}
+
+.now-next:empty {
+  display: none;
+}
+
+/* The station departure board from the main site, sized for a wall. */
+.board {
+  --fs: 2.2rem;
+  padding: 1rem;
+  background: var(--haven-night);
+  border: 0.6rem solid var(--haven-bark);
+  border-radius: 2rem;
+  box-shadow:
+    0 0.7rem 0 var(--haven-brown-dark),
+    inset 0 0 3rem rgb(0 0 0 / 0.6);
+  color: var(--haven-yellow);
+  font-family: var(--font-board);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.board-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 1rem 0.9rem;
+  border-bottom: 0.15rem dashed rgb(255 208 89 / 0.25);
+  font-size: 1.9rem;
+  color: var(--haven-orange-mid);
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs);
+}
+
+.rows li {
+  display: grid;
+  grid-template-columns: 5ch 1fr auto;
+  gap: 0 1.2em;
+  align-items: baseline;
+  padding: 0.35em 1rem;
+  line-height: 1.15;
+  border-radius: 0.6rem;
+  transition:
+    background 0.6s,
+    opacity 0.6s;
+}
+
+.rows li + li {
+  border-top: 1px solid rgb(255 208 89 / 0.12);
+}
+
+.rows .dest {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rows .dest small {
+  margin-left: 0.8em;
+  font-size: 0.65em;
+  opacity: 0.7;
+}
+
+.rows .status {
+  font-size: 0.75em;
+  color: var(--haven-teal);
+}
+
+.rows li.past {
+  opacity: 0.4;
+}
+
+.rows li.past .status {
+  color: inherit;
+}
+
+.rows li.now {
+  background: rgb(255 208 89 / 0.14);
+  font-weight: 900;
+}
+
+.rows li.now .status {
+  color: var(--haven-orange-mid);
+  animation: blink 1.2s steps(2, jump-none) infinite;
+}
+
+.rows li.next .status {
+  color: var(--haven-yellow);
+}
+
+@keyframes blink {
+  to {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- countdown ---------- */
+
+.countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.countdown-label {
+  max-width: 100rem;
+  font-size: 5rem;
+  line-height: 1.1;
+  color: var(--haven-butter);
+  text-shadow: 0 0.3rem 0 rgb(107 52 20 / 0.8);
+  text-wrap: balance;
+}
+
+.countdown-digits {
+  font-size: 30rem;
+  color: var(--haven-cream);
+  text-shadow:
+    0 0.05em 0 var(--haven-bark),
+    0 0.1em 0.25em rgb(60 26 6 / 0.45);
+}
+
+.countdown-digits.long {
+  font-size: 22rem;
+}
+
+.countdown-digits.xlong {
+  font-size: 17rem;
+}
+
+.countdown-digits.final {
+  color: var(--haven-yellow);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.countdown-done {
+  max-width: 100rem;
+  font-family: var(--font-display);
+  font-size: 16rem;
+  line-height: 0.95;
+  color: var(--haven-yellow);
+  text-shadow: 0 0.06em 0 var(--haven-bark);
+  text-wrap: balance;
+  animation: pop 0.8s var(--ease-bounce) both;
+}
+
+.countdown-until {
+  margin-top: 1rem;
+  font-size: 2.6rem;
+  opacity: 0.85;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.4) rotate(-6deg);
+    opacity: 0;
+  }
+}
+
+/* ---------- message + flash announcement ---------- */
+
+.message {
+  display: grid;
+  place-items: center;
+}
+
+.card {
+  position: relative;
+  max-width: 96rem;
+  min-width: 50rem;
+  padding: 4.5rem 6rem 5rem;
+  background: var(--card-bg);
+  border-radius: 3.5rem;
+  box-shadow:
+    0 1.2rem 0 rgb(60 26 6 / 0.55),
+    0 2rem 4rem rgb(60 26 6 / 0.4);
+  color: var(--card-fg);
+  text-align: center;
+  rotate: -1deg;
+  overflow: hidden;
+}
+
+.card-kicker {
+  font-size: 1.9rem;
+  padding-left: 1.8rem;
+}
+
+.card-kicker:empty {
+  display: none;
+}
+
+.card-title {
+  margin-top: 2rem;
+  font-size: 11rem;
+  overflow-wrap: anywhere;
+}
+
+.card-title.medium {
+  font-size: 8rem;
+}
+
+.card-title.small {
+  font-size: 5.6rem;
+}
+
+.card-title:empty {
+  display: none;
+}
+
+.card-body {
+  margin-top: 2rem;
+  font-size: 3.8rem;
+  line-height: 1.25;
+  white-space: pre-line;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.card-body.small {
+  font-size: 2.8rem;
+}
+
+.card-body:empty {
+  display: none;
+}
+
+.alert {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 4rem 6rem calc(4rem + var(--ticker-h));
+  background: rgb(42 26 16 / 0.78);
+  backdrop-filter: blur(0.6rem);
+  animation: fade 0.3s both;
+}
+
+.alert .card {
+  animation: pop 0.7s var(--ease-bounce) both;
+}
+
+.alert-progress {
+  position: absolute;
+  inset: auto 0 0;
+  height: 1rem;
+  background: rgb(0 0 0 / 0.15);
+}
+
+.alert-progress i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--card-accent);
+  transform-origin: left;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- embedded website ---------- */
+
+.embed {
+  padding: 0;
+  transform: none;
+}
+
+.embed iframe {
+  position: absolute;
+  inset: 0 0 var(--ticker-h);
+  width: 100%;
+  height: calc(100% - var(--ticker-h));
+  border: 0;
+  background: #fff;
+}
+
+.embed-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--haven-night);
+  font-size: 3rem;
+}
+
+/* ---------- always-on furniture ---------- */
+
+.chrome {
+  position: absolute;
+  inset: 2rem 3.5rem auto;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: opacity 0.5s;
+}
+
+.chrome-logo {
+  height: 6.5rem;
+  width: auto;
+  filter: drop-shadow(0 0.25rem 0 rgb(107 52 20 / 0.6));
+}
+
+.chrome-clock {
+  padding: 0.7rem 1.6rem 1rem;
+  background: var(--haven-cream);
+  border-radius: 999px;
+  box-shadow: 0 0.4rem 0 rgb(60 26 6 / 0.35);
+  color: var(--haven-bark);
+  font-size: 3.6rem;
+  rotate: 2deg;
+}
+
+#stage[data-scene="idle"] .chrome {
+  opacity: 0;
+}
+
+#stage[data-scene="embed"] .chrome-logo,
+#stage[data-scene="embed"]:not(.embed-clock) .chrome-clock {
+  display: none;
+}
+
+#stage[data-scene="embed"] .chrome {
+  justify-content: flex-end;
+}
+
+.ticker {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 6;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--haven-night);
+  border-top: 0.3rem solid var(--haven-orange-deep);
+  color: var(--haven-yellow);
+  font-family: var(--font-board);
+  font-weight: 900;
+  font-size: 2.7rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ticker span {
+  display: inline-block;
+  will-change: transform;
+}
+
+.offline {
+  position: absolute;
+  right: 2rem;
+  bottom: calc(1.5rem + var(--ticker-h));
+  z-index: 7;
+  padding: 0.5rem 1.2rem;
+  background: var(--haven-night);
+  border-radius: 999px;
+  font-size: 1.4rem;
+  opacity: 0.8;
+}

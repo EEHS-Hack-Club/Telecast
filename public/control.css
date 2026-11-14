@@ -1,0 +1,472 @@
+/* The organisers' side: used on laptops and phones, so it's ordinary responsive sizing, not screen-scaled. */
+body {
+  margin: 0;
+  background: var(--haven-butter);
+  font-family: var(--font-body);
+  color: var(--haven-bark);
+  font-size: 1rem;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding: 0.9rem clamp(1rem, 3vw, 2rem);
+  background: var(--haven-orange-deep);
+  color: var(--haven-cream);
+}
+
+.top h1 {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
+.top h1 span {
+  color: var(--haven-yellow);
+}
+
+.status {
+  margin: 0;
+  padding: 0.3rem 0.8rem;
+  background: rgb(0 0 0 / 0.18);
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+
+.status::before {
+  content: "";
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-right: 0.45rem;
+  border-radius: 50%;
+  background: var(--haven-yellow);
+}
+
+.status[data-state="live"]::before {
+  background: #7dffb0;
+}
+
+.status[data-state="offline"]::before {
+  background: #fff;
+  animation: blink 1s steps(2, jump-none) infinite;
+}
+
+@keyframes blink {
+  to {
+    opacity: 0.2;
+  }
+}
+
+.top-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.top .button.ghost {
+  background: transparent;
+  color: var(--haven-cream);
+  border-color: var(--haven-cream);
+  box-shadow: none;
+}
+
+.layout {
+  display: grid;
+  gap: 1.25rem;
+  width: min(100% - 2rem, 80rem);
+  margin: 1.25rem auto 4rem;
+}
+
+.column {
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
+  min-width: 0;
+}
+
+@media (width >= 62rem) {
+  .layout {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: start;
+  }
+
+  .sticky {
+    position: sticky;
+    top: 1.25rem;
+  }
+}
+
+.panel {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  background: var(--haven-cream);
+  border: 0.2rem solid var(--haven-bark);
+  border-radius: 1.25rem;
+  box-shadow: 0 0.35rem 0 var(--haven-brown-dark);
+}
+
+.panel h2 {
+  font-size: 1.7rem;
+}
+
+.panel h2 small {
+  margin-left: 0.4rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+.panel.live {
+  border-color: var(--haven-orange-deep);
+  box-shadow: 0 0.35rem 0 var(--haven-orange-deep);
+}
+
+.panel.live h2::after {
+  content: "on screen";
+  margin-left: 0.6rem;
+  padding: 0.15rem 0.6rem;
+  background: var(--haven-orange-deep);
+  border-radius: 999px;
+  color: var(--haven-cream);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  opacity: 0.75;
+}
+
+label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.95rem;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  background: #fff;
+  border: 0.125rem solid var(--haven-brown-light);
+  border-radius: 0.7rem;
+  font: inherit;
+  font-size: 1rem;
+  color: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+:is(input, textarea, select, button, a):focus-visible {
+  outline: 0.2rem solid var(--haven-orange-deep);
+  outline-offset: 0.125rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+}
+
+.check input,
+.tones input {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: none;
+  accent-color: var(--haven-orange-deep);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.85rem;
+  align-items: start;
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+legend {
+  padding: 0;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.tones,
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.tones legend,
+.checks legend {
+  width: 100%;
+}
+
+.tones {
+  gap: 0.4rem;
+}
+
+.tones label {
+  display: block;
+  cursor: pointer;
+}
+
+.tones input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tones span {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  background: var(--card-bg);
+  border: 0.2rem solid transparent;
+  border-radius: 999px;
+  color: var(--card-fg);
+  font-size: 0.9rem;
+}
+
+.tones input:checked + span {
+  border-color: var(--haven-bark);
+  box-shadow: 0 0 0 0.15rem var(--haven-cream) inset;
+}
+
+.tones input:focus-visible + span {
+  outline: 0.2rem solid var(--haven-orange-deep);
+  outline-offset: 0.125rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  background: var(--haven-orange-deep);
+  border: 0.15rem solid var(--haven-bark);
+  border-radius: 999px;
+  box-shadow: 0 0.2rem 0 var(--haven-bark);
+  color: var(--haven-cream);
+  font: inherit;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.button:active {
+  transform: translateY(0.15rem);
+  box-shadow: 0 0.05rem 0 var(--haven-bark);
+}
+
+.button.ghost {
+  background: #fff;
+  color: var(--haven-bark);
+}
+
+.button.small {
+  justify-self: start;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+form[data-dirty] .button[type="submit"]:not(.ghost) {
+  background: var(--haven-green-dark);
+}
+
+/* ---------- preview + scene switcher ---------- */
+
+.preview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--haven-night);
+  border-radius: 0.8rem;
+}
+
+.preview iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  border: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.scenes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.scenes button {
+  padding: 0.75rem 0.4rem;
+  background: #fff;
+  border: 0.15rem solid var(--haven-brown-light);
+  border-radius: 0.8rem;
+  font: inherit;
+  font-size: 1rem;
+  color: inherit;
+  cursor: pointer;
+}
+
+.scenes button[aria-pressed="true"] {
+  background: var(--haven-orange-deep);
+  border-color: var(--haven-bark);
+  box-shadow: 0 0.2rem 0 var(--haven-bark);
+  color: var(--haven-cream);
+}
+
+/* ---------- countdown + schedule editors ---------- */
+
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.quick button {
+  padding: 0.35rem 0.8rem;
+  background: var(--haven-butter);
+  border: 0.125rem solid var(--haven-brown-light);
+  border-radius: 999px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.items {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.items li {
+  display: grid;
+  grid-template-columns: 4.6rem minmax(0, 1.3fr) minmax(0, 1fr) 2.4rem;
+  gap: 0.4rem;
+}
+
+.items input {
+  padding: 0.45rem 0.6rem;
+}
+
+.items .time {
+  font-family: var(--font-board);
+  font-weight: 900;
+}
+
+.items .remove {
+  background: none;
+  border: 0;
+  border-radius: 0.6rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--haven-orange-deep);
+  cursor: pointer;
+}
+
+@media (width < 36rem) {
+  .items li {
+    grid-template-columns: 4.6rem minmax(0, 1fr) 2.4rem;
+  }
+
+  .items .detail {
+    grid-column: 1 / 3;
+    grid-row: 2;
+  }
+}
+
+.danger {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+  justify-items: start;
+}
+
+/* ---------- login + toast ---------- */
+
+.login {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(107 52 20 / 0.7);
+  backdrop-filter: blur(0.4rem);
+}
+
+.login .panel {
+  width: min(100%, 22rem);
+}
+
+.error {
+  margin: 0;
+  color: var(--haven-red);
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  z-index: 11;
+  margin: 0;
+  padding: 0.6rem 1.2rem;
+  background: var(--haven-night);
+  border-radius: 999px;
+  color: var(--haven-cream);
+  translate: -50% 0;
+  white-space: nowrap;
+}
+
+.toast.bad {
+  background: var(--haven-red);
+}
