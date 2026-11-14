@@ -2,32 +2,34 @@
  * The organisers' control panel. Each form edits one section of the shared state and saves it with
  * a PATCH; the server then pushes the result to every screen (and back here) at once.
  */
-const $ = (sel, root = document) => root.querySelector(sel);
-const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+import type { Channel, Content, Me, ScheduleItem, Scene, State } from "../shared/types.ts";
+import { $, $$, connect } from "./live.ts";
 
-const KEY = "screens-passcode";
-let passcode = localStorage.getItem(KEY) || "";
-let state = null;
+type Section = Exclude<keyof Content, "scene">;
+type Field = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+
+let state: State | null = null;
+let me: Me | null = null;
 
 /* ---------- talking to the server ---------- */
 
-async function api(method, path, body) {
+async function api<T = unknown>(method: string, path: string, body?: unknown): Promise<T> {
   const res = await fetch(path, {
     method,
-    headers: { Authorization: `Bearer ${passcode}`, "Content-Type": "application/json" },
+    headers: body === undefined ? {} : { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+  const data = (await res.json().catch(() => ({}))) as { error?: string };
   if (res.status === 401) {
-    askForPasscode();
-    throw new Error("Enter the passcode to make changes");
+    showSignIn(data.error);
+    throw new Error(data.error ?? "Sign in to make changes");
   }
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || "That didn't save. Try again.");
-  return data;
+  if (!res.ok) throw new Error(data.error ?? "That didn't save. Try again.");
+  return data as T;
 }
 
-let toastTimer;
-function toast(text, bad = false) {
+let toastTimer: ReturnType<typeof setTimeout> | undefined;
+function toast(text: string, bad = false) {
   const el = $("#toast");
   el.textContent = text;
   el.classList.toggle("bad", bad);
@@ -37,119 +39,178 @@ function toast(text, bad = false) {
 }
 
 /** Runs a change and reports how it went, so every button behaves the same way. */
-async function run(action, done) {
+async function run(action: () => Promise<unknown>, done?: string): Promise<boolean> {
   try {
     await action();
     if (done) toast(done);
     return true;
   } catch (err) {
-    toast(err.message, true);
+    toast((err as Error).message, true);
     return false;
   }
 }
 
-/* ---------- passcode ---------- */
+/* ---------- signing in ---------- */
 
-function askForPasscode() {
+const SIGN_IN_PROBLEMS: Record<string, string> = {
+  "not-member": "You're not in the organisers' Slack channel, so you can't use this panel. Ask an organiser to add you, then sign in again.",
+  setup: "Sign-in isn't set up yet. Whoever runs this Telecast needs to add its Slack details and an admin.",
+  cancelled: "Sign-in was cancelled.",
+  expired: "That sign-in took too long. Try again.",
+  slack: "Couldn't reach Slack. Try again in a moment.",
+};
+
+function showSignIn(reason?: string) {
+  $("#loginReason").textContent = reason ?? "Sign in with Slack to change what's on the screens.";
   $("#login").hidden = false;
-  $("#login input").focus();
 }
 
-$("#login").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  passcode = new FormData(event.target).get("passcode");
-  const res = await fetch("/api/login", { method: "POST", headers: { Authorization: `Bearer ${passcode}` } });
-  $("#loginError").hidden = res.ok;
-  if (!res.ok) return;
-  localStorage.setItem(KEY, passcode);
-  event.target.reset();
+async function loadMe() {
+  const problem = new URLSearchParams(location.search).get("error");
+  if (problem) history.replaceState(null, "", location.pathname);
+  const res = await fetch("/api/me");
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    return showSignIn(problem ? SIGN_IN_PROBLEMS[problem] : res.status === 401 ? undefined : data.error);
+  }
+  me = (await res.json()) as Me;
   $("#login").hidden = true;
+
+  const who = $("#who");
+  who.hidden = false;
+  $("#whoName").textContent = me.user.name;
+  const picture = $<HTMLImageElement>("#whoPicture");
+  picture.hidden = !me.user.picture;
+  if (me.user.picture) picture.src = me.user.picture;
+
+  await renderAccess();
+}
+
+$("#signOut").addEventListener("click", async () => {
+  await fetch("/auth/logout", { method: "POST" });
+  location.reload();
+});
+
+/* ---------- who can use the panel ---------- */
+
+async function renderAccess() {
+  if (!me) return;
+  const { channel, user } = me;
+  $("#accessSummary").textContent = channel
+    ? `Anyone in the private Slack channel #${channel.name || channel.id} can sign in here.`
+    : "No Slack channel has been chosen yet, so only admins can sign in.";
+  $("#accessForm").hidden = !user.admin;
+  if (!user.admin) return;
+
+  const select = $<HTMLSelectElement>("#channel");
+  try {
+    const { channels } = await api<{ channels: Channel[] }>("GET", "/api/channels");
+    select.replaceChildren(
+      new Option(channels.length ? "Choose a channel…" : "The bot isn't in any private channels yet", ""),
+      ...channels.map((c) => new Option(`#${c.name}`, c.id, false, c.id === channel?.id)),
+    );
+  } catch (err) {
+    select.replaceChildren(new Option((err as Error).message, ""));
+  }
+}
+
+$("#accessForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const id = $<HTMLSelectElement>("#channel").value;
+  void run(async () => {
+    const { channel } = await api<{ channel: Channel }>("PUT", "/api/channel", { id });
+    if (me) me.channel = channel;
+    await renderAccess();
+  }, "Organisers' channel saved");
 });
 
 /* ---------- forms ---------- */
 
-const sectionForms = $$("form[data-section]");
+const sectionForms = $$<HTMLFormElement>("form[data-section]");
+const sectionOf = (form: HTMLFormElement) => form.dataset.section as Section;
+const formFor = (section: Section) => $<HTMLFormElement>(`form[data-section='${section}']`);
 
-function fieldValue(el) {
-  if (el.type === "checkbox") return el.checked;
-  if (el.type === "number") return Number(el.value);
-  return el.value;
-}
-
-function collect(form) {
-  const section = form.dataset.section;
-  const data = {};
-  for (const el of $$("[data-field]", form)) {
-    if (el.type === "radio" && !el.checked) continue;
-    data[el.dataset.field] = fieldValue(el);
+function collect(form: HTMLFormElement): Record<string, unknown> {
+  const section = sectionOf(form);
+  const data: Record<string, unknown> = {};
+  for (const el of $$<Field>("[data-field]", form)) {
+    const input = el as HTMLInputElement;
+    if (input.type === "radio" && !input.checked) continue;
+    data[el.dataset.field!] =
+      input.type === "checkbox" ? input.checked : input.type === "number" ? Number(input.value) : el.value;
   }
   if (section === "countdown") {
-    const target = new Date($("#countdownTarget").value).getTime();
+    const target = new Date($<HTMLInputElement>("#countdownTarget").value).getTime();
     if (Number.isFinite(target)) data.target = target;
   }
   if (section === "schedule") {
-    data.items = $$("#items li").map((li) => ({
-      time: $(".time", li).value,
-      title: $(".title", li).value,
-      detail: $(".detail", li).value,
-    }));
+    data.items = $$("#items li").map(
+      (li): ScheduleItem => ({
+        time: $<HTMLInputElement>(".time", li).value,
+        title: $<HTMLInputElement>(".title", li).value,
+        detail: $<HTMLInputElement>(".detail", li).value,
+      }),
+    );
   }
   if (section === "rotate") {
-    data.scenes = $$("#rotateScenes input:checked").map((el) => el.value);
-    if (!data.scenes.length) throw new Error("Pick at least one scene to rotate through");
+    const scenes = $$<HTMLInputElement>("#rotateScenes input:checked").map((el) => el.value);
+    if (!scenes.length) throw new Error("Pick at least one scene to rotate through");
+    data.scenes = scenes;
   }
   return data;
 }
 
 /** A timestamp as the value a datetime-local input expects, in this device's own time zone. */
-function toLocalInput(ms) {
-  const d = new Date(ms);
-  return new Date(ms - d.getTimezoneOffset() * 60_000).toISOString().slice(0, 19);
+function toLocalInput(ms: number): string {
+  return new Date(ms - new Date(ms).getTimezoneOffset() * 60_000).toISOString().slice(0, 19);
 }
 
-function addItem(item = { time: "", title: "", detail: "" }) {
-  const li = $("#itemTemplate").content.firstElementChild.cloneNode(true);
-  $(".time", li).value = item.time;
-  $(".title", li).value = item.title;
-  $(".detail", li).value = item.detail;
+function addItem(item: ScheduleItem = { time: "", title: "", detail: "" }): HTMLElement {
+  const template = $<HTMLTemplateElement>("#itemTemplate");
+  const li = template.content.firstElementChild!.cloneNode(true) as HTMLElement;
+  $<HTMLInputElement>(".time", li).value = item.time;
+  $<HTMLInputElement>(".title", li).value = item.title;
+  $<HTMLInputElement>(".detail", li).value = item.detail;
   $("#items").append(li);
   return li;
 }
 
-function fill(form) {
-  const section = form.dataset.section;
-  const data = state[section];
-  for (const el of $$("[data-field]", form)) {
-    const value = data[el.dataset.field];
-    if (el.type === "checkbox") el.checked = Boolean(value);
-    else if (el.type === "radio") el.checked = el.value === value;
-    else el.value = value ?? "";
+function fill(form: HTMLFormElement, s: State) {
+  const section = sectionOf(form);
+  const data = s[section] as unknown as Record<string, unknown>;
+  for (const el of $$<Field>("[data-field]", form)) {
+    const value = data[el.dataset.field!];
+    const input = el as HTMLInputElement;
+    if (input.type === "checkbox") input.checked = Boolean(value);
+    else if (input.type === "radio") input.checked = input.value === value;
+    else el.value = String(value ?? "");
   }
-  if (section === "countdown") $("#countdownTarget").value = toLocalInput(data.target);
+  if (section === "countdown") $<HTMLInputElement>("#countdownTarget").value = toLocalInput(s.countdown.target);
   if (section === "schedule") {
     $("#items").replaceChildren();
-    data.items.forEach(addItem);
+    s.schedule.items.forEach(addItem);
   }
   if (section === "rotate") {
-    for (const el of $$("#rotateScenes input")) el.checked = data.scenes.includes(el.value);
+    for (const el of $$<HTMLInputElement>("#rotateScenes input")) {
+      el.checked = s.rotate.scenes.includes(el.value as Scene);
+    }
   }
 }
 
 for (const form of sectionForms) {
   // Once someone starts typing, incoming updates leave this form alone until it's saved.
-  const markDirty = () => (form.dataset.dirty = "");
-  form.addEventListener("input", markDirty);
+  form.addEventListener("input", () => (form.dataset.dirty = ""));
 
-  form.addEventListener("submit", async (event) => {
+  form.addEventListener("submit", (event) => {
     event.preventDefault();
-    const show = event.submitter?.dataset.show;
-    await run(
+    const show = (event.submitter as HTMLElement | null)?.dataset.show;
+    void run(
       async () => {
-        const patch = { [form.dataset.section]: collect(form) };
+        const patch: Record<string, unknown> = { [sectionOf(form)]: collect(form) };
         if (show) patch.scene = show;
         await api("PATCH", "/api/state", patch);
         delete form.dataset.dirty;
-        if (state) fill(form);
+        if (state) fill(form, state);
       },
       show ? "Saved and on screen" : "Saved",
     );
@@ -158,20 +219,21 @@ for (const form of sectionForms) {
 
 $("#addItem").addEventListener("click", () => {
   $(".time", addItem()).focus();
-  $("form[data-section='schedule']").dataset.dirty = "";
+  formFor("schedule").dataset.dirty = "";
 });
 
 $("#items").addEventListener("click", (event) => {
-  if (!event.target.matches(".remove")) return;
-  event.target.closest("li").remove();
-  $("form[data-section='schedule']").dataset.dirty = "";
+  const target = event.target as HTMLElement;
+  if (!target.matches(".remove")) return;
+  target.closest("li")?.remove();
+  formFor("schedule").dataset.dirty = "";
 });
 
 $("#quick").addEventListener("click", (event) => {
-  const minutes = Number(event.target.dataset.minutes);
+  const minutes = Number((event.target as HTMLElement).dataset.minutes);
   if (!minutes) return;
-  const form = event.target.closest("form");
-  run(async () => {
+  const form = formFor("countdown");
+  void run(async () => {
     const countdown = { ...collect(form), target: Date.now() + minutes * 60_000 };
     await api("PATCH", "/api/state", { countdown, scene: "countdown" });
     delete form.dataset.dirty;
@@ -181,85 +243,80 @@ $("#quick").addEventListener("click", (event) => {
 /* ---------- scene switcher, flash announcement, housekeeping ---------- */
 
 $("#scenes").addEventListener("click", (event) => {
-  const scene = event.target.dataset.scene;
-  if (scene) run(() => api("PATCH", "/api/state", { scene }));
+  const scene = (event.target as HTMLElement).dataset.scene;
+  if (scene) void run(() => api("PATCH", "/api/state", { scene }));
 });
 
-$("#alertForm").addEventListener("submit", (event) => {
+$<HTMLFormElement>("#alertForm").addEventListener("submit", (event) => {
   event.preventDefault();
-  const form = event.target;
+  const form = event.currentTarget as HTMLFormElement;
   const data = Object.fromEntries(new FormData(form));
-  data.seconds = Number(data.seconds);
-  run(async () => {
-    await api("POST", "/api/alert", data);
-    form.title.value = "";
-    form.body.value = "";
+  void run(async () => {
+    await api("POST", "/api/alert", { ...data, seconds: Number(data.seconds) });
+    $<HTMLInputElement>("[name=title]", form).value = "";
+    $<HTMLTextAreaElement>("[name=body]", form).value = "";
   }, "Announcement sent");
 });
 
-$("#clearAlert").addEventListener("click", () => run(() => api("DELETE", "/api/alert"), "Announcement cleared"));
-
-$("#reloadScreens").addEventListener("click", () => run(() => api("POST", "/api/reload"), "Screens refreshed"));
+$("#clearAlert").addEventListener("click", () => void run(() => api("DELETE", "/api/alert"), "Announcement cleared"));
+$("#reloadScreens").addEventListener("click", () => void run(() => api("POST", "/api/reload"), "Screens refreshed"));
 
 $("#reset").addEventListener("click", () => {
   if (!confirm("Reset every scene to its starting content? This can't be undone.")) return;
-  run(async () => {
-    await api("POST", "/api/reset");
-    for (const form of sectionForms) delete form.dataset.dirty;
-    for (const form of sectionForms) fill(form);
-  }, "Everything reset");
+  for (const form of sectionForms) delete form.dataset.dirty;
+  void run(() => api("POST", "/api/reset"), "Everything reset");
 });
 
 /* ---------- live updates ---------- */
 
 let displays = 0;
-function setStatus(kind) {
+let online = false;
+
+function renderStatus() {
   const el = $("#status");
-  el.dataset.state = kind;
-  el.textContent =
-    kind === "live"
-      ? `Live · ${displays} ${displays === 1 ? "screen" : "screens"} connected`
-      : kind === "offline"
-        ? "Reconnecting…"
-        : "Connecting…";
+  el.dataset.state = online ? "live" : "offline";
+  el.textContent = online
+    ? `Live · ${displays} ${displays === 1 ? "screen" : "screens"} connected`
+    : "Reconnecting…";
 }
 
-function render() {
+function render(s: State) {
   for (const form of sectionForms) {
-    if (!("dirty" in form.dataset)) fill(form);
-    const scene = form.dataset.section;
-    form.classList.toggle(
-      "live",
-      state.scene === scene || (state.scene === "rotate" && state.rotate.scenes.includes(scene)),
-    );
+    if (!("dirty" in form.dataset)) fill(form, s);
+    const scene = sectionOf(form) as Scene;
+    form.classList.toggle("live", s.scene === scene || (s.scene === "rotate" && s.rotate.scenes.includes(scene)));
   }
   for (const button of $$("#scenes button")) {
-    button.setAttribute("aria-pressed", String(button.dataset.scene === state.scene));
+    button.setAttribute("aria-pressed", String(button.dataset.scene === s.scene));
   }
-  $("#clearAlert").hidden = !state.alert;
+  $("#clearAlert").hidden = !s.alert;
 }
 
-const source = new EventSource("/events?role=control");
-source.addEventListener("state", (event) => {
-  state = JSON.parse(event.data).state;
-  setStatus("live");
-  render();
-});
-source.addEventListener("stats", (event) => {
-  displays = JSON.parse(event.data).displays;
-  setStatus("live");
-});
-source.addEventListener("error", () => setStatus("offline"));
+connect(
+  "control",
+  (message) => {
+    if (message.type === "state") {
+      state = message.state;
+      $("#eventName").textContent = message.config.eventName;
+      document.title = `Telecast · ${message.config.eventName}`;
+      render(state);
+    } else if (message.type === "stats") {
+      displays = message.displays;
+      renderStatus();
+    }
+  },
+  (isOnline) => {
+    online = isOnline;
+    renderStatus();
+  },
+);
 
 /* ---------- preview ---------- */
 
 // The preview is the real display page at 1920×1080, shrunk to fit, so it matches the venue screens exactly.
 const preview = $("#preview");
 new ResizeObserver(([entry]) => {
-  preview.firstElementChild.style.transform = `scale(${entry.contentRect.width / 1920})`;
+  if (entry) $("iframe", preview).style.transform = `scale(${entry.contentRect.width / 1920})`;
 }).observe(preview);
 
-// Check the saved passcode up front, so a stale one is caught before someone tries to send something urgent.
-fetch("/api/login", { method: "POST", headers: { Authorization: `Bearer ${passcode}` } }).then((res) => {
-  if (!res.ok) askForPasscode();
-});
+void loadMe();

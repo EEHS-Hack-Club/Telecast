@@ -1,25 +1,33 @@
-/* Palette and type shared with haven.london (src/styles/global.css). Change the brand here. */
+/*
+ * The event's look: fonts, colours and backdrop. Both pages load this file, so re-theming Telecast
+ * for another event means editing it and replacing the images in this folder.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Darumadrop+One&family=Doto:wght@700;900&family=Jua&display=swap");
+
 :root {
   --font-display: "Darumadrop One", "Jua", ui-rounded, system-ui, sans-serif;
   --font-body: "Jua", ui-rounded, system-ui, sans-serif;
   --font-board: "Doto", ui-monospace, monospace;
 
-  --haven-green: #b8c220;
-  --haven-green-deep: #97a01a;
-  --haven-green-dark: #6f7612;
-  --haven-orange-deep: #ed5615;
-  --haven-orange-bright: #fa681b;
-  --haven-orange-mid: #fc8616;
-  --haven-yellow: #ffd059;
-  --haven-butter: #ffe382;
-  --haven-cream: #fff6dc;
-  --haven-gold: #fba71f;
-  --haven-brown-dark: #b8774a;
-  --haven-brown-light: #dda47d;
-  --haven-bark: #6b3414;
-  --haven-teal: #2cbf90;
-  --haven-night: #2a1a10;
-  --haven-red: #d92b3a;
+  --c-green: #b8c220;
+  --c-green-deep: #97a01a;
+  --c-green-dark: #6f7612;
+  --c-orange-deep: #ed5615;
+  --c-orange-bright: #fa681b;
+  --c-orange-mid: #fc8616;
+  --c-yellow: #ffd059;
+  --c-butter: #ffe382;
+  --c-cream: #fff6dc;
+  --c-gold: #fba71f;
+  --c-brown-dark: #b8774a;
+  --c-brown-light: #dda47d;
+  --c-bark: #6b3414;
+  --c-teal: #2cbf90;
+  --c-night: #2a1a10;
+  --c-red: #d92b3a;
+
+  /* The picture behind every scene. */
+  --backdrop: url("/theme/background.webp");
 
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -32,27 +40,27 @@
 
 /* Announcement colours, used by the message scene, flash announcements and the control panel swatches. */
 .tone-orange {
-  --card-bg: var(--haven-orange-deep);
-  --card-fg: var(--haven-cream);
-  --card-accent: var(--haven-yellow);
+  --card-bg: var(--c-orange-deep);
+  --card-fg: var(--c-cream);
+  --card-accent: var(--c-yellow);
 }
 .tone-green {
-  --card-bg: var(--haven-green);
+  --card-bg: var(--c-green);
   --card-fg: #3d2409;
-  --card-accent: var(--haven-bark);
+  --card-accent: var(--c-bark);
 }
 .tone-teal {
-  --card-bg: var(--haven-teal);
+  --card-bg: var(--c-teal);
   --card-fg: #0f3327;
-  --card-accent: var(--haven-cream);
+  --card-accent: var(--c-cream);
 }
 .tone-yellow {
-  --card-bg: var(--haven-butter);
-  --card-fg: var(--haven-bark);
-  --card-accent: var(--haven-orange-deep);
+  --card-bg: var(--c-butter);
+  --card-fg: var(--c-bark);
+  --card-accent: var(--c-orange-deep);
 }
 .tone-red {
-  --card-bg: var(--haven-red);
+  --card-bg: var(--c-red);
   --card-fg: #fff;
-  --card-accent: var(--haven-yellow);
+  --card-accent: var(--c-yellow);
 }

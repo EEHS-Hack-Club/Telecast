@@ -1,9 +1,9 @@
 /* The organisers' side: used on laptops and phones, so it's ordinary responsive sizing, not screen-scaled. */
 body {
   margin: 0;
-  background: var(--haven-butter);
+  background: var(--c-butter);
   font-family: var(--font-body);
-  color: var(--haven-bark);
+  color: var(--c-bark);
   font-size: 1rem;
 }
 
@@ -26,8 +26,8 @@ h2 {
   align-items: center;
   gap: 0.75rem 1.25rem;
   padding: 0.9rem clamp(1rem, 3vw, 2rem);
-  background: var(--haven-orange-deep);
-  color: var(--haven-cream);
+  background: var(--c-orange-deep);
+  color: var(--c-cream);
 }
 
 .top h1 {
@@ -35,7 +35,7 @@ h2 {
 }
 
 .top h1 span {
-  color: var(--haven-yellow);
+  color: var(--c-yellow);
 }
 
 .status {
@@ -53,7 +53,7 @@ h2 {
   height: 0.6rem;
   margin-right: 0.45rem;
   border-radius: 50%;
-  background: var(--haven-yellow);
+  background: var(--c-yellow);
 }
 
 .status[data-state="live"]::before {
@@ -72,6 +72,9 @@ h2 {
 }
 
 .top-actions {
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
   display: flex;
   gap: 0.5rem;
   margin-left: auto;
@@ -79,8 +82,8 @@ h2 {
 
 .top .button.ghost {
   background: transparent;
-  color: var(--haven-cream);
-  border-color: var(--haven-cream);
+  color: var(--c-cream);
+  border-color: var(--c-cream);
   box-shadow: none;
 }
 
@@ -114,10 +117,10 @@ h2 {
   display: grid;
   gap: 0.85rem;
   padding: 1.25rem;
-  background: var(--haven-cream);
-  border: 0.2rem solid var(--haven-bark);
+  background: var(--c-cream);
+  border: 0.2rem solid var(--c-bark);
   border-radius: 1.25rem;
-  box-shadow: 0 0.35rem 0 var(--haven-brown-dark);
+  box-shadow: 0 0.35rem 0 var(--c-brown-dark);
 }
 
 .panel h2 {
@@ -133,17 +136,17 @@ h2 {
 }
 
 .panel.live {
-  border-color: var(--haven-orange-deep);
-  box-shadow: 0 0.35rem 0 var(--haven-orange-deep);
+  border-color: var(--c-orange-deep);
+  box-shadow: 0 0.35rem 0 var(--c-orange-deep);
 }
 
 .panel.live h2::after {
   content: "on screen";
   margin-left: 0.6rem;
   padding: 0.15rem 0.6rem;
-  background: var(--haven-orange-deep);
+  background: var(--c-orange-deep);
   border-radius: 999px;
-  color: var(--haven-cream);
+  color: var(--c-cream);
   font-family: var(--font-body);
   font-size: 0.8rem;
   letter-spacing: 0.04em;
@@ -170,7 +173,7 @@ select {
   min-width: 0;
   padding: 0.6rem 0.75rem;
   background: #fff;
-  border: 0.125rem solid var(--haven-brown-light);
+  border: 0.125rem solid var(--c-brown-light);
   border-radius: 0.7rem;
   font: inherit;
   font-size: 1rem;
@@ -182,7 +185,7 @@ textarea {
 }
 
 :is(input, textarea, select, button, a):focus-visible {
-  outline: 0.2rem solid var(--haven-orange-deep);
+  outline: 0.2rem solid var(--c-orange-deep);
   outline-offset: 0.125rem;
 }
 
@@ -198,7 +201,7 @@ textarea {
   width: 1.2rem;
   height: 1.2rem;
   flex: none;
-  accent-color: var(--haven-orange-deep);
+  accent-color: var(--c-orange-deep);
 }
 
 .row {
@@ -259,12 +262,12 @@ legend {
 }
 
 .tones input:checked + span {
-  border-color: var(--haven-bark);
-  box-shadow: 0 0 0 0.15rem var(--haven-cream) inset;
+  border-color: var(--c-bark);
+  box-shadow: 0 0 0 0.15rem var(--c-cream) inset;
 }
 
 .tones input:focus-visible + span {
-  outline: 0.2rem solid var(--haven-orange-deep);
+  outline: 0.2rem solid var(--c-orange-deep);
   outline-offset: 0.125rem;
 }
 
@@ -278,11 +281,11 @@ legend {
 .button {
   display: inline-block;
   padding: 0.6rem 1.2rem;
-  background: var(--haven-orange-deep);
-  border: 0.15rem solid var(--haven-bark);
+  background: var(--c-orange-deep);
+  border: 0.15rem solid var(--c-bark);
   border-radius: 999px;
-  box-shadow: 0 0.2rem 0 var(--haven-bark);
-  color: var(--haven-cream);
+  box-shadow: 0 0.2rem 0 var(--c-bark);
+  color: var(--c-cream);
   font: inherit;
   font-size: 1rem;
   text-decoration: none;
@@ -292,12 +295,12 @@ legend {
 
 .button:active {
   transform: translateY(0.15rem);
-  box-shadow: 0 0.05rem 0 var(--haven-bark);
+  box-shadow: 0 0.05rem 0 var(--c-bark);
 }
 
 .button.ghost {
   background: #fff;
-  color: var(--haven-bark);
+  color: var(--c-bark);
 }
 
 .button.small {
@@ -312,7 +315,7 @@ legend {
 }
 
 form[data-dirty] .button[type="submit"]:not(.ghost) {
-  background: var(--haven-green-dark);
+  background: var(--c-green-dark);
 }
 
 /* ---------- preview + scene switcher ---------- */
@@ -321,7 +324,7 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: var(--haven-night);
+  background: var(--c-night);
   border-radius: 0.8rem;
 }
 
@@ -345,7 +348,7 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
 .scenes button {
   padding: 0.75rem 0.4rem;
   background: #fff;
-  border: 0.15rem solid var(--haven-brown-light);
+  border: 0.15rem solid var(--c-brown-light);
   border-radius: 0.8rem;
   font: inherit;
   font-size: 1rem;
@@ -354,10 +357,10 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
 }
 
 .scenes button[aria-pressed="true"] {
-  background: var(--haven-orange-deep);
-  border-color: var(--haven-bark);
-  box-shadow: 0 0.2rem 0 var(--haven-bark);
-  color: var(--haven-cream);
+  background: var(--c-orange-deep);
+  border-color: var(--c-bark);
+  box-shadow: 0 0.2rem 0 var(--c-bark);
+  color: var(--c-cream);
 }
 
 /* ---------- countdown + schedule editors ---------- */
@@ -372,8 +375,8 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
 
 .quick button {
   padding: 0.35rem 0.8rem;
-  background: var(--haven-butter);
-  border: 0.125rem solid var(--haven-brown-light);
+  background: var(--c-butter);
+  border: 0.125rem solid var(--c-brown-light);
   border-radius: 999px;
   font: inherit;
   color: inherit;
@@ -409,7 +412,7 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
   border-radius: 0.6rem;
   font-size: 1.4rem;
   line-height: 1;
-  color: var(--haven-orange-deep);
+  color: var(--c-orange-deep);
   cursor: pointer;
 }
 
@@ -450,7 +453,7 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
 
 .error {
   margin: 0;
-  color: var(--haven-red);
+  color: var(--c-red);
 }
 
 .toast {
@@ -460,13 +463,50 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
   z-index: 11;
   margin: 0;
   padding: 0.6rem 1.2rem;
-  background: var(--haven-night);
+  background: var(--c-night);
   border-radius: 999px;
-  color: var(--haven-cream);
+  color: var(--c-cream);
   translate: -50% 0;
   white-space: nowrap;
 }
 
 .toast.bad {
-  background: var(--haven-red);
+  background: var(--c-red);
+}
+
+/* ---------- signed-in organiser ---------- */
+
+.who {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.who img {
+  border-radius: 50%;
+}
+
+.who button {
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#accessForm {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.login p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.login .button {
+  justify-self: start;
 }

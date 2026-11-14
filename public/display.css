@@ -9,9 +9,9 @@ html {
 body {
   margin: 0;
   overflow: hidden;
-  background: var(--haven-night);
+  background: var(--c-night);
   font-family: var(--font-body);
-  color: var(--haven-cream);
+  color: var(--c-cream);
   cursor: none;
 }
 
@@ -55,7 +55,7 @@ h2 {
   inset: -3%;
   background:
     radial-gradient(ellipse at 50% 45%, transparent 35%, rgb(107 52 20 / 0.45) 100%),
-    url("/assets/hero-bg-no-sticky-tree.webp") center / cover;
+    var(--backdrop) center / cover;
   animation: drift 60s ease-in-out infinite alternate;
 }
 
@@ -180,7 +180,7 @@ h2 {
   background: #fff;
   border-radius: 999px;
   box-shadow: 0 0.35rem 0 rgb(0 0 0 / 0.18);
-  color: var(--haven-bark);
+  color: var(--c-bark);
   font-size: 2rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -215,9 +215,9 @@ h2 {
 .idle-clock {
   margin-top: -1rem;
   font-size: 24rem;
-  color: var(--haven-cream);
+  color: var(--c-cream);
   text-shadow:
-    0 0.05em 0 var(--haven-bark),
+    0 0.05em 0 var(--c-bark),
     0 0.1em 0.25em rgb(60 26 6 / 0.45);
 }
 
@@ -233,7 +233,7 @@ h2 {
   font-family: var(--font-display);
   font-size: 4.6rem;
   line-height: 1;
-  color: var(--haven-butter);
+  color: var(--c-butter);
   text-shadow: 0 0.25rem 0 rgb(107 52 20 / 0.8);
   text-wrap: balance;
 }
@@ -250,7 +250,7 @@ h2 {
 .idle-next .sign-label {
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--haven-orange-deep);
+  color: var(--c-orange-deep);
 }
 
 .idle-next b {
@@ -306,8 +306,8 @@ h2 {
   }
 }
 
-/* The hedgehog art is cropped at the waist, so it peeks over the bottom edge of the screen. */
-.hedgehog {
+/* The mascot art is cropped at the waist, so it peeks over the bottom edge of the screen. */
+.mascot {
   position: absolute;
   bottom: var(--ticker-h);
   left: 30%;
@@ -345,16 +345,16 @@ h2 {
 .schedule h2 {
   margin-top: 1.6rem;
   font-size: 9rem;
-  text-shadow: 0 0.4rem 0 var(--haven-bark);
+  text-shadow: 0 0.4rem 0 var(--c-bark);
 }
 
 .now-card {
   margin-top: 3rem;
   padding: 2.2rem 2.4rem;
-  background: var(--haven-cream);
+  background: var(--c-cream);
   border-radius: 2rem;
-  box-shadow: 0 0.6rem 0 var(--haven-brown-dark);
-  color: var(--haven-bark);
+  box-shadow: 0 0.6rem 0 var(--c-brown-dark);
+  color: var(--c-bark);
   rotate: 1deg;
 }
 
@@ -362,7 +362,7 @@ h2 {
   font-size: 1.8rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--haven-orange-deep);
+  color: var(--c-orange-deep);
 }
 
 .now-title {
@@ -389,13 +389,13 @@ h2 {
 .board {
   --fs: 2.2rem;
   padding: 1rem;
-  background: var(--haven-night);
-  border: 0.6rem solid var(--haven-bark);
+  background: var(--c-night);
+  border: 0.6rem solid var(--c-bark);
   border-radius: 2rem;
   box-shadow:
-    0 0.7rem 0 var(--haven-brown-dark),
+    0 0.7rem 0 var(--c-brown-dark),
     inset 0 0 3rem rgb(0 0 0 / 0.6);
-  color: var(--haven-yellow);
+  color: var(--c-yellow);
   font-family: var(--font-board);
   font-weight: 700;
   text-transform: uppercase;
@@ -407,7 +407,7 @@ h2 {
   padding: 0.4rem 1rem 0.9rem;
   border-bottom: 0.15rem dashed rgb(255 208 89 / 0.25);
   font-size: 1.9rem;
-  color: var(--haven-orange-mid);
+  color: var(--c-orange-mid);
 }
 
 .rows {
@@ -448,7 +448,7 @@ h2 {
 
 .rows .status {
   font-size: 0.75em;
-  color: var(--haven-teal);
+  color: var(--c-teal);
 }
 
 .rows li.past {
@@ -465,12 +465,12 @@ h2 {
 }
 
 .rows li.now .status {
-  color: var(--haven-orange-mid);
+  color: var(--c-orange-mid);
   animation: blink 1.2s steps(2, jump-none) infinite;
 }
 
 .rows li.next .status {
-  color: var(--haven-yellow);
+  color: var(--c-yellow);
 }
 
 @keyframes blink {
@@ -493,16 +493,16 @@ h2 {
   max-width: 100rem;
   font-size: 5rem;
   line-height: 1.1;
-  color: var(--haven-butter);
+  color: var(--c-butter);
   text-shadow: 0 0.3rem 0 rgb(107 52 20 / 0.8);
   text-wrap: balance;
 }
 
 .countdown-digits {
   font-size: 30rem;
-  color: var(--haven-cream);
+  color: var(--c-cream);
   text-shadow:
-    0 0.05em 0 var(--haven-bark),
+    0 0.05em 0 var(--c-bark),
     0 0.1em 0.25em rgb(60 26 6 / 0.45);
 }
 
@@ -515,7 +515,7 @@ h2 {
 }
 
 .countdown-digits.final {
-  color: var(--haven-yellow);
+  color: var(--c-yellow);
   animation: pulse 1s ease-in-out infinite;
 }
 
@@ -524,8 +524,8 @@ h2 {
   font-family: var(--font-display);
   font-size: 16rem;
   line-height: 0.95;
-  color: var(--haven-yellow);
-  text-shadow: 0 0.06em 0 var(--haven-bark);
+  color: var(--c-yellow);
+  text-shadow: 0 0.06em 0 var(--c-bark);
   text-wrap: balance;
   animation: pop 0.8s var(--ease-bounce) both;
 }
@@ -674,7 +674,7 @@ h2 {
   inset: 0;
   display: grid;
   place-items: center;
-  background: var(--haven-night);
+  background: var(--c-night);
   font-size: 3rem;
 }
 
@@ -698,10 +698,10 @@ h2 {
 
 .chrome-clock {
   padding: 0.7rem 1.6rem 1rem;
-  background: var(--haven-cream);
+  background: var(--c-cream);
   border-radius: 999px;
   box-shadow: 0 0.4rem 0 rgb(60 26 6 / 0.35);
-  color: var(--haven-bark);
+  color: var(--c-bark);
   font-size: 3.6rem;
   rotate: 2deg;
 }
@@ -727,9 +727,9 @@ h2 {
   display: flex;
   align-items: center;
   overflow: hidden;
-  background: var(--haven-night);
-  border-top: 0.3rem solid var(--haven-orange-deep);
-  color: var(--haven-yellow);
+  background: var(--c-night);
+  border-top: 0.3rem solid var(--c-orange-deep);
+  color: var(--c-yellow);
   font-family: var(--font-board);
   font-weight: 900;
   font-size: 2.7rem;
@@ -748,7 +748,7 @@ h2 {
   bottom: calc(1.5rem + var(--ticker-h));
   z-index: 7;
   padding: 0.5rem 1.2rem;
-  background: var(--haven-night);
+  background: var(--c-night);
   border-radius: 999px;
   font-size: 1.4rem;
   opacity: 0.8;

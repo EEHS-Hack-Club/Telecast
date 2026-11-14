@@ -2,10 +2,16 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "screens",
+      "name": "telecast (pretend Slack)",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["canvas/server.mjs"],
+      "runtimeArgs": ["scripts/dev-mock.ts"],
       "port": 8080
+    },
+    {
+      "name": "telecast (workers)",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["exec", "wrangler", "dev", "--port", "8788"],
+      "port": 8788
     }
   ]
 }

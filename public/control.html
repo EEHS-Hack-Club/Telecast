@@ -4,22 +4,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>Screens · Haven London</title>
+    <title>Telecast</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Darumadrop+One&family=Doto:wght@700;900&family=Jua&display=swap"
-    />
-    <link rel="stylesheet" href="/brand.css" />
+    <link rel="stylesheet" href="/theme/theme.css" />
     <link rel="stylesheet" href="/control.css" />
   </head>
   <body>
     <header class="top">
-      <h1>Haven London <span>screens</span></h1>
+      <h1>Telecast <span id="eventName"></span></h1>
       <p class="status" id="status" data-state="connecting">Connecting…</p>
       <div class="top-actions">
+        <span class="who" id="who" hidden>
+          <img id="whoPicture" alt="" width="28" height="28" hidden />
+          <span id="whoName"></span>
+          <button type="button" id="signOut">Sign out</button>
+        </span>
         <a class="button ghost" href="/" target="_blank" rel="noopener">Open screen</a>
         <button class="button ghost" type="button" id="reloadScreens">Refresh screens</button>
       </div>
@@ -87,7 +88,7 @@
           <h2>Clock <small>shown when nothing else is on</small></h2>
           <label>Welcome line <input data-field="message" maxlength="200" /></label>
           <label class="check"><input type="checkbox" data-field="showNext" /> Show what's next on the schedule</label>
-          <label class="check"><input type="checkbox" data-field="stickers" /> Stickers and hedgehog</label>
+          <label class="check"><input type="checkbox" data-field="stickers" /> Stickers and mascot</label>
           <div class="actions">
             <button class="button" type="submit">Save</button>
             <button class="button ghost" type="submit" data-show="idle">Save &amp; show</button>
@@ -175,6 +176,19 @@
           </div>
         </form>
 
+        <section class="panel">
+          <h2>Who can use this panel</h2>
+          <p class="hint" id="accessSummary"></p>
+          <form id="accessForm" hidden>
+            <label
+              >Organisers' channel
+              <select id="channel" required></select>
+            </label>
+            <p class="hint">Only private channels the Telecast bot has been invited to are listed. Admins can always sign in.</p>
+            <div class="actions"><button class="button" type="submit">Save</button></div>
+          </form>
+        </section>
+
         <section class="panel danger">
           <h2>Start over</h2>
           <p class="hint">Puts every scene back to how it was before anyone changed anything.</p>
@@ -183,14 +197,13 @@
       </div>
     </main>
 
-    <form class="login" id="login" hidden>
+    <div class="login" id="login" hidden>
       <div class="panel">
         <h2>Organisers only</h2>
-        <label>Passcode <input type="password" name="passcode" autocomplete="current-password" required /></label>
-        <p class="error" id="loginError" hidden>That passcode isn't right.</p>
-        <button class="button" type="submit">Unlock</button>
+        <p id="loginReason"></p>
+        <a class="button" href="/auth/login">Sign in with Slack</a>
       </div>
-    </form>
+    </div>
 
     <p class="toast" id="toast" role="status" hidden></p>
 

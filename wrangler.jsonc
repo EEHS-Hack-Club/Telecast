@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "telecast",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2026-10-01",
+
+  // Builds the pages into dist/public before each dev run or deploy.
+  "build": { "command": "node build.ts" },
+
+  "assets": {
+    "directory": "./dist/public",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  },
+
+  "durable_objects": {
+    "bindings": [{ "name": "ROOM", "class_name": "TelecastRoom" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["TelecastRoom"] }],
+
+  "version_metadata": { "binding": "VERSION" }
+
+  // Slack credentials and TELECAST_ADMINS are set with `wrangler secret put` (see README).
+}

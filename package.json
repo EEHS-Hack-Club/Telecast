@@ -1,13 +1,37 @@
 {
-  "name": "haven-screens",
+  "name": "telecast",
   "private": true,
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "description": "Live venue screens for events, with a control panel for organisers.",
+  "packageManager": "pnpm@10.28.1",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.18"
   },
   "scripts": {
-    "start": "node server.mjs",
-    "dev": "node --watch server.mjs"
+    "build": "node build.ts",
+    "start": "node dist/server.cjs",
+    "dev": "node build.ts && node --env-file-if-exists=.env dist/server.cjs",
+    "dev:mock": "node build.ts && node scripts/dev-mock.ts",
+    "dev:worker": "wrangler dev",
+    "deploy:worker": "wrangler deploy",
+    "typecheck": "tsc -p tsconfig.node.json && tsc -p tsconfig.client.json && tsc -p tsconfig.worker.json"
+  },
+  "dependencies": {
+    "ws": "^8.23.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261114.1",
+    "@types/node": "^26.6.6",
+    "@types/ws": "^8.18.2",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.162.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd"
+    ]
   }
 }

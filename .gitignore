@@ -150,3 +150,9 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Telecast
+data/
+dist/
+.dev.vars
+.wrangler/
