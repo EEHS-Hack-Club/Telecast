@@ -4,7 +4,7 @@ Live screens for an event venue, with a control panel for the organisers. Built 
 [Haven London](https://haven.london); made so other events can run their own.
 
 - `/` is the screen. Open it on each TV or projector and click once (or press F) to go full screen.
-- `/control` is the organisers' panel. Sign in with Slack; it works on a phone, and every change
+- `/control` is the organisers' panel. Sign in with Hack Club; it works on a phone, and every change
   reaches every screen straight away.
 
 One deployment runs one event.
@@ -25,26 +25,23 @@ scrolling **ticker** along the bottom.
 
 ## Who can use the control panel
 
-Access follows a **private Slack channel**: anyone in it can sign in, and anyone removed from it
-loses access within a minute. Admins (listed in `TELECAST_ADMINS`) can always sign in, and choose
-the channel from the control panel under "Who can use this panel".
+People sign in with [Hack Club Auth](https://auth.hackclub.com). Admins (listed by email in
+`TELECAST_ADMINS`) can always sign in, and add the other organisers' emails in the control panel
+under "Who can use this panel". Taking someone off the list takes their access away straight away.
 
-### Setting up Slack
+### Setting up Hack Club Auth
 
-1. Create a Slack app from [`slack-manifest.yml`](slack-manifest.yml), changing the redirect URL to
-   `https://<your address>/auth/callback`.
-2. Install it to the workspace. Copy the **client ID** and **client secret** (Basic Information) and
-   the **bot token** (OAuth & Permissions).
-3. Invite the bot to the organisers' private channel: `/invite @Telecast`.
-4. Set the variables below, with your own Slack member ID in `TELECAST_ADMINS`.
-5. Open `/control`, sign in, and pick the channel.
+1. Create an app at [auth.hackclub.com/developer/apps](https://auth.hackclub.com/developer/apps)
+   with the redirect URI `https://<your address>/auth/callback` and the scopes `openid`, `email`
+   and `name`.
+2. Copy the **client ID** and **client secret**.
+3. Set the variables below, with your own Hack Club Auth email in `TELECAST_ADMINS`.
+4. Open `/control`, sign in, and add the other organisers.
 
 | Variable | Purpose |
 | --- | --- |
-| `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET` | The Slack app, for "Sign in with Slack". |
-| `SLACK_BOT_TOKEN` | The bot token (`xoxb-…`), for checking who is in the channel. |
-| `TELECAST_ADMINS` | Comma-separated Slack member IDs. |
-| `SLACK_CHANNEL_ID` | Optional. A starting channel, used until an admin picks one. |
+| `HACKCLUB_CLIENT_ID`, `HACKCLUB_CLIENT_SECRET` | The Hack Club Auth app, for "Sign in with Hack Club". |
+| `TELECAST_ADMINS` | Comma-separated emails, as used for Hack Club Auth. |
 | `PUBLIC_URL` | Optional. The public address, if a proxy in front doesn't pass it along. |
 
 ## Hosting
@@ -59,7 +56,7 @@ docker build -t telecast .
 docker run -p 8080:8080 --env-file .env -v telecast:/data telecast
 ```
 
-The volume at `/data` keeps what's on screen, the chosen channel and the cookie-signing key across
+The volume at `/data` keeps what's on screen, the organisers' list and the cookie-signing key across
 redeploys. `PORT` and `DATA_DIR` can be changed if needed. A proxy in front must allow WebSockets on
 `/ws` and pass `X-Forwarded-Proto` and `X-Forwarded-Host` (or set `PUBLIC_URL`).
 
@@ -68,10 +65,10 @@ redeploys. `PORT` and `DATA_DIR` can be changed if needed. A proxy in front must
 Runs as a Worker with static assets and one Durable Object (works on the free plan).
 
 ```bash
-pnpm exec wrangler secret put SLACK_CLIENT_ID
+pnpm exec wrangler secret put HACKCLUB_CLIENT_ID
 ```
 
-Repeat for `SLACK_CLIENT_SECRET`, `SLACK_BOT_TOKEN` and `TELECAST_ADMINS`, then:
+Repeat for `HACKCLUB_CLIENT_SECRET` and `TELECAST_ADMINS`, then:
 
 ```bash
 pnpm deploy:worker
@@ -104,8 +101,8 @@ pnpm install
 pnpm dev:mock
 ```
 
-`dev:mock` runs Telecast on port 8080 against a pretend Slack, so you can sign in as an admin, a
-channel member or an outsider without a real Slack app. `pnpm dev` uses real credentials from
+`dev:mock` runs Telecast on port 8080 against a pretend Hack Club Auth, so you can sign in as an
+admin, an organiser or an outsider without a real app. `pnpm dev` uses real credentials from
 `.env`; `pnpm dev:worker` runs the Cloudflare version locally (credentials in `.dev.vars`).
 
 | Folder | What's in it |

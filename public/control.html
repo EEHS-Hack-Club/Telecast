@@ -17,7 +17,6 @@
       <p class="status" id="status" data-state="connecting">Connecting…</p>
       <div class="top-actions">
         <span class="who" id="who" hidden>
-          <img id="whoPicture" alt="" width="28" height="28" hidden />
           <span id="whoName"></span>
           <button type="button" id="signOut">Sign out</button>
         </span>
@@ -181,10 +180,10 @@
           <p class="hint" id="accessSummary"></p>
           <form id="accessForm" hidden>
             <label
-              >Organisers' channel
-              <select id="channel" required></select>
+              >Organisers' emails
+              <textarea id="organisers" rows="6" spellcheck="false" autocapitalize="off" placeholder="one@example.com"></textarea>
             </label>
-            <p class="hint">Only private channels the Telecast bot has been invited to are listed. Admins can always sign in.</p>
+            <p class="hint">One per line: the email each person uses for Hack Club Auth. Removing someone takes their access away straight away. Admins can always sign in.</p>
             <div class="actions"><button class="button" type="submit">Save</button></div>
           </form>
         </section>
@@ -201,7 +200,7 @@
       <div class="panel">
         <h2>Organisers only</h2>
         <p id="loginReason"></p>
-        <a class="button" href="/auth/login">Sign in with Slack</a>
+        <a class="button" href="/auth/login">Sign in with Hack Club</a>
       </div>
     </div>
 

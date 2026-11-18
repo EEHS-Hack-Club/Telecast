@@ -4,16 +4,14 @@
  * code runs under Node (Docker) and in a Cloudflare Durable Object.
  */
 import config from "../../telecast.config.ts";
-import type { Channel, Me, PublicConfig, Role, ServerMessage, State, User } from "../shared/types.ts";
+import type { Me, PublicConfig, Role, ServerMessage, State, User } from "../shared/types.ts";
 import { cookie, randomToken, readCookie, seal, unseal } from "./session.ts";
-import { Slack, SlackError, type SlackEnv } from "./slack.ts";
+import { HackClubAuth, HackClubError, type HackClubEnv } from "./hackclub.ts";
 import { applyPatch, freshState, newAlert, restoreState } from "./state.ts";
 
-export interface Env extends SlackEnv {
-  /** Comma-separated Slack user IDs who can always sign in and who choose the organisers' channel. */
+export interface Env extends HackClubEnv {
+  /** Comma-separated emails of the people who can always sign in and who choose the other organisers. */
   TELECAST_ADMINS?: string;
-  /** Optional starting channel, used until an admin picks one in the control panel. */
-  SLACK_CHANNEL_ID?: string;
   /** The address people use, e.g. https://telecast.haven.london. Needed when a proxy hides it. */
   PUBLIC_URL?: string;
 }
@@ -21,7 +19,8 @@ export interface Env extends SlackEnv {
 /** What gets written to disk or Durable Object storage. */
 export interface Saved {
   state: unknown;
-  channel: Channel | null;
+  /** Emails of the organisers the admins have let in. */
+  organisers?: string[];
   /** Signs session cookies. Made once on first run, so there's no secret to configure. */
   secret: string;
 }
@@ -49,6 +48,10 @@ class HttpError extends Error {
 const SESSION_COOKIE = "telecast_session";
 const LOGIN_COOKIE = "telecast_login";
 const SESSION_DAYS = 7;
+const MAX_ORGANISERS = 200;
+
+const cleanEmail = (value: unknown) => (typeof value === "string" ? value.trim().toLowerCase() : "");
+const isEmail = (value: string) => value.length <= 254 && /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/.test(value);
 
 const publicConfig: PublicConfig = {
   eventName: config.eventName,
@@ -83,10 +86,10 @@ async function readJson(request: Request): Promise<unknown> {
 
 export class Telecast {
   private state: State = freshState(config.defaults);
-  private channel: Channel | null = null;
+  private organisers: string[] = [];
   private secret = "";
   private loading?: Promise<void>;
-  private readonly slack: Slack;
+  private readonly hackClub: HackClubAuth;
   private readonly admins: Set<string>;
 
   constructor(
@@ -95,8 +98,8 @@ export class Telecast {
     /** Changes with each deploy; screens reload themselves when they see a new one. */
     private readonly build: string,
   ) {
-    this.slack = new Slack(env);
-    this.admins = new Set((env.TELECAST_ADMINS ?? "").split(",").map((s) => s.trim()).filter(Boolean));
+    this.hackClub = new HackClubAuth(env);
+    this.admins = new Set((env.TELECAST_ADMINS ?? "").split(",").map(cleanEmail).filter(Boolean));
   }
 
   /** Loads saved state once. Everything public awaits this first. */
@@ -108,11 +111,8 @@ export class Telecast {
     const saved = await this.host.read();
     if (saved) {
       this.state = restoreState(config.defaults, saved.state);
-      this.channel = saved.channel ?? null;
+      this.organisers = Array.isArray(saved.organisers) ? saved.organisers.map(cleanEmail).filter(isEmail) : [];
       this.secret = saved.secret ?? "";
-    }
-    if (!this.channel && this.env.SLACK_CHANNEL_ID) {
-      this.channel = { id: this.env.SLACK_CHANNEL_ID, name: "" };
     }
     if (!this.secret) {
       this.secret = randomToken();
@@ -122,7 +122,7 @@ export class Telecast {
   }
 
   private persist(): Promise<void> {
-    return this.host.write({ state: this.state, channel: this.channel, secret: this.secret });
+    return this.host.write({ state: this.state, organisers: this.organisers, secret: this.secret });
   }
 
   /* ---------- live connections ---------- */
@@ -178,30 +178,26 @@ export class Telecast {
     return (this.env.PUBLIC_URL || new URL(request.url).origin).replace(/\/$/, "");
   }
 
-  private isAdmin(userId: string): boolean {
-    return this.admins.has(userId);
+  private isAdmin(user: User): boolean {
+    return this.admins.has(user.email);
   }
 
-  /** Admins always get in; everyone else must be in the organisers' channel right now. */
-  private async allowed(userId: string): Promise<boolean> {
-    if (this.isAdmin(userId)) return true;
-    if (!this.channel) return false;
-    return this.slack.isMember(this.channel.id, userId);
+  /** Admins always get in; everyone else must be on the organisers' list right now. */
+  private allowed(user: User): boolean {
+    return this.isAdmin(user) || this.organisers.includes(user.email);
   }
 
   private async user(request: Request): Promise<User> {
     const user = await unseal<User>(readCookie(request, SESSION_COOKIE), this.secret);
-    if (!user) throw new HttpError(401, "Sign in to make changes");
-    // Checked on every request, so leaving the channel takes access away within a minute.
-    if (!(await this.allowed(user.id))) {
-      throw new HttpError(401, "You're no longer in the organisers' channel");
-    }
+    if (!user || typeof user.email !== "string") throw new HttpError(401, "Sign in to make changes");
+    // Checked on every request, so being taken off the list takes access away straight away.
+    if (!this.allowed(user)) throw new HttpError(401, "You're no longer on the organisers' list");
     return user;
   }
 
   private async admin(request: Request): Promise<User> {
     const user = await this.user(request);
-    if (!this.isAdmin(user.id)) throw new HttpError(403, "Only an admin can change this");
+    if (!this.isAdmin(user)) throw new HttpError(403, "Only an admin can change this");
     return user;
   }
 
@@ -223,9 +219,9 @@ export class Telecast {
       return await this.api(request, url);
     } catch (err) {
       if (err instanceof HttpError) return json(err.status, { error: err.message });
-      if (err instanceof SlackError) {
+      if (err instanceof HackClubError) {
         console.error(err.message);
-        return json(502, { error: "Couldn't reach Slack. Try again in a moment." });
+        return json(502, { error: "Couldn't reach Hack Club Auth. Try again in a moment." });
       }
       console.error(err);
       return json(500, { error: "Something went wrong on the server" });
@@ -240,11 +236,11 @@ export class Telecast {
     const fail = (reason: string) => redirect(`/control?error=${reason}`, [cookie(LOGIN_COOKIE, "", 0, secure)]);
 
     if (route === "GET /auth/login") {
-      if (!this.slack.configured) return fail("setup");
-      // The state value ties Slack's answer to this browser, so a sign-in can't be started by another site.
+      if (!this.hackClub.configured) return fail("setup");
+      // The state value ties Hack Club Auth's answer to this browser, so a sign-in can't be started by another site.
       const state = randomToken(16);
       const sealed = await seal({ state }, Date.now() + 600_000, this.secret);
-      return redirect(this.slack.authorizeUrl(callback, state), [cookie(LOGIN_COOKIE, sealed, 600, secure)]);
+      return redirect(this.hackClub.authorizeUrl(callback, state), [cookie(LOGIN_COOKIE, sealed, 600, secure)]);
     }
 
     if (route === "GET /auth/callback") {
@@ -255,14 +251,12 @@ export class Telecast {
 
       let user: User;
       try {
-        user = await this.slack.identify(code, callback);
-        if (!(await this.allowed(user.id))) {
-          return fail(this.channel || this.admins.size ? "not-member" : "setup");
-        }
+        user = await this.hackClub.identify(code, callback);
       } catch (err) {
         console.error(err);
-        return fail("slack");
+        return fail("hackclub");
       }
+      if (!this.allowed(user)) return fail(this.admins.size ? "not-organiser" : "setup");
       const maxAge = SESSION_DAYS * 86_400;
       const session = await seal(user, Date.now() + maxAge * 1000, this.secret);
       return redirect("/control", [
@@ -287,30 +281,21 @@ export class Telecast {
 
     if (route === "GET /api/me") {
       const user = await this.user(request);
-      // A channel preset by ID has no name yet; fill it in the first time someone looks.
-      if (this.channel && !this.channel.name) {
-        this.channel = await this.slack.channel(this.channel.id).catch(() => this.channel);
-      }
-      const me: Me = { user: { ...user, admin: this.isAdmin(user.id) }, channel: this.channel };
+      const me: Me = { user: { ...user, admin: this.isAdmin(user) }, organisers: this.organisers };
       return json(200, me);
     }
 
-    if (route === "GET /api/channels") {
+    if (route === "PUT /api/organisers") {
       await this.admin(request);
-      return json(200, { channels: await this.slack.privateChannels() });
-    }
-
-    if (route === "PUT /api/channel") {
-      await this.admin(request);
-      const { id } = (await readJson(request)) as { id?: unknown };
-      if (typeof id !== "string" || !id) throw new HttpError(400, "Choose a channel");
-      try {
-        this.channel = await this.slack.channel(id);
-      } catch (err) {
-        throw new HttpError(400, err instanceof SlackError ? err.message : "Couldn't use that channel");
-      }
+      const { emails } = (await readJson(request)) as { emails?: unknown };
+      if (!Array.isArray(emails)) throw new HttpError(400, "Send a list of emails");
+      const cleaned = [...new Set(emails.map(cleanEmail).filter(Boolean))].sort();
+      const bad = cleaned.find((email) => !isEmail(email));
+      if (bad) throw new HttpError(400, `"${bad.slice(0, 80)}" doesn't look like an email address`);
+      if (cleaned.length > MAX_ORGANISERS) throw new HttpError(400, `That's more than ${MAX_ORGANISERS} organisers`);
+      this.organisers = cleaned;
       await this.persist();
-      return json(200, { channel: this.channel });
+      return json(200, { organisers: this.organisers });
     }
 
     await this.user(request);

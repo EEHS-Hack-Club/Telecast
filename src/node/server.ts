@@ -179,14 +179,14 @@ server.on("upgrade", (req, socket, head) => {
 
 async function main() {
   await telecast.ready();
-  if (!process.env.SLACK_CLIENT_ID || !process.env.SLACK_CLIENT_SECRET || !process.env.SLACK_BOT_TOKEN) {
+  if (!process.env.HACKCLUB_CLIENT_ID || !process.env.HACKCLUB_CLIENT_SECRET) {
     console.warn(
-      "Slack isn't set up, so nobody can sign in to the control panel yet. " +
-        "Set SLACK_CLIENT_ID, SLACK_CLIENT_SECRET and SLACK_BOT_TOKEN (see README).",
+      "Hack Club Auth isn't set up, so nobody can sign in to the control panel yet. " +
+        "Set HACKCLUB_CLIENT_ID and HACKCLUB_CLIENT_SECRET (see README).",
     );
   }
-  if (!process.env.TELECAST_ADMINS && !process.env.SLACK_CHANNEL_ID) {
-    console.warn("Set TELECAST_ADMINS to your Slack user ID so you can sign in and choose the organisers' channel.");
+  if (!process.env.TELECAST_ADMINS) {
+    console.warn("Set TELECAST_ADMINS to your Hack Club Auth email so you can sign in and add the other organisers.");
   }
   server.listen(PORT, () => console.log(`Telecast: screens on http://localhost:${PORT}, control panel on /control`));
 }

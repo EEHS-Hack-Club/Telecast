@@ -483,10 +483,6 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
   font-size: 0.9rem;
 }
 
-.who img {
-  border-radius: 50%;
-}
-
 .who button {
   padding: 0;
   background: none;

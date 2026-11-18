@@ -15,7 +15,7 @@ ENV NODE_ENV=production PORT=8080 DATA_DIR=/data
 
 COPY --from=build /app/dist ./dist
 
-# What's on screen, the chosen Slack channel and the cookie-signing key are saved here.
+# What's on screen, the organisers' list and the cookie-signing key are saved here.
 # Mount a volume so they survive a redeploy.
 RUN mkdir -p /data && chown node:node /data
 VOLUME /data

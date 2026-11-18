@@ -1,12 +1,11 @@
-/** Runs Telecast locally against the pretend Slack in mock-slack.ts. For development only. */
-import { MOCK_SLACK_PORT } from "./mock-slack.ts";
+/** Runs Telecast locally against the pretend Hack Club Auth in mock-hackclub.ts. For development only. */
+import { MOCK_ADMIN_EMAIL, MOCK_HACKCLUB_PORT } from "./mock-hackclub.ts";
 
 Object.assign(process.env, {
-  SLACK_BASE_URL: `http://localhost:${MOCK_SLACK_PORT}`,
-  SLACK_CLIENT_ID: "mock",
-  SLACK_CLIENT_SECRET: "mock",
-  SLACK_BOT_TOKEN: "mock",
-  TELECAST_ADMINS: "U_ADA",
+  HACKCLUB_AUTH_URL: `http://localhost:${MOCK_HACKCLUB_PORT}`,
+  HACKCLUB_CLIENT_ID: "mock",
+  HACKCLUB_CLIENT_SECRET: "mock",
+  TELECAST_ADMINS: MOCK_ADMIN_EMAIL,
   DATA_DIR: process.env.DATA_DIR ?? "data/mock",
 });
 

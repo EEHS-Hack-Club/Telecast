@@ -70,20 +70,17 @@ export type ServerMessage =
 
 export type Role = "display" | "control";
 
-export interface Channel {
-  id: string;
-  name: string;
-}
-
 export interface User {
+  /** The Hack Club Auth identity, e.g. ident!abc123. */
   id: string;
   name: string;
-  picture: string;
+  /** Lower-cased. This is what access is decided by. */
+  email: string;
 }
 
 /** What /api/me returns to a signed-in organiser. */
 export interface Me {
   user: User & { admin: boolean };
-  /** The private Slack channel whose members may use the control panel. */
-  channel: Channel | null;
+  /** Emails of the people (besides admins) who may use the control panel. */
+  organisers: string[];
 }
