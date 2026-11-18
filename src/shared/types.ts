@@ -3,7 +3,7 @@
 export const SCENES = ["idle", "schedule", "countdown", "message", "embed", "rotate"] as const;
 export type Scene = (typeof SCENES)[number];
 
-export const TONES = ["orange", "green", "teal", "yellow", "red"] as const;
+export const TONES = ["red", "blue", "navy", "white"] as const;
 export type Tone = (typeof TONES)[number];
 
 export interface ScheduleItem {

@@ -5,34 +5,34 @@
 import type { TelecastConfig } from "./src/shared/types.ts";
 
 const config: TelecastConfig = {
-  eventName: "Haven London",
+  eventName: "EEHS Hack Club",
   timeZone: "Europe/London",
 
   stickers: [
     ...Array.from({ length: 11 }, (_, i) => `/theme/stickers/sticker${i + 1}.webp`),
     "/theme/stickers/flag.svg",
   ],
-  mascot: true,
+  mascot: false,
 
   defaults: {
     scene: "idle",
 
     idle: {
-      message: "Welcome to Haven London!",
+      message: "Welcome to EEHS Hack Club!",
       showNext: true,
       stickers: true,
     },
 
     message: {
       kicker: "Announcement",
-      title: "Lunch is ready",
-      body: "Pizza in the main hall.",
-      tone: "orange",
+      title: "Snacks are out",
+      body: "Help yourself at the front.",
+      tone: "red",
     },
 
     countdown: {
-      label: "Hacking ends in",
-      target: Date.parse("2026-11-14T17:00:00Z"),
+      label: "Show & tell in",
+      target: Date.parse("2026-12-02T16:40:00Z"),
       doneText: "Time's up!",
     },
 
@@ -42,20 +42,14 @@ const config: TelecastConfig = {
     },
 
     schedule: {
-      title: "Haven Line",
-      platform: "Platform 1",
+      title: "EEHS Hack Club",
+      platform: "Today",
       items: [
-        { time: "9:00", title: "doors open", detail: "Come and get set up!"},
-        { time: "9:45", title: "opening ceremony", detail: "" },
-        { time: "10:15", title: "form teams & start building", detail: "We'll have icebreakers!" },
-        { time: "10:25", title: "godot & ren'py workshop", detail: "" },
-        { time: "12:00", title: "lunch!", detail: "" },
-        { time: "14:00", title: "art workshop", detail: "" },
-        { time: "17:00", title: "ship projects", detail: "" },
-        { time: "17:15", title: "project demos & voting", detail: "Show off your awesome game!" },
-        { time: "18:30", title: "dinner", detail: "" },
-        { time: "19:00", title: "closing ceremony", detail: "" },
-        { time: "19:30", title: "home time", detail: "" },
+        { time: "15:30", title: "doors open", detail: "Grab a seat and a snack" },
+        { time: "15:40", title: "what's new", detail: "" },
+        { time: "15:50", title: "build time", detail: "Work on your project" },
+        { time: "16:40", title: "show & tell", detail: "" },
+        { time: "17:00", title: "home time", detail: "" },
       ],
     },
 
@@ -65,8 +59,8 @@ const config: TelecastConfig = {
     },
 
     ticker: {
-      enabled: true,
-      text: "Ada has free Wi-Fi! SSID: ADA-Events Password: Wentworth1837",
+      enabled: false,
+      text: "",
     },
   },
 };

@@ -250,7 +250,8 @@ function renderTicker(s: State) {
 function render(s: State) {
   setText($("#idleMessage"), s.idle.message);
   $("#stickers").classList.toggle("off", !s.idle.stickers);
-  $("#mascot").hidden = !(s.idle.stickers && config?.mascot);
+  mascot.hidden = !(s.idle.stickers && config?.mascot);
+  if (config?.mascot && !mascot.src) mascot.src = "/theme/mascot.webp";
 
   fillCard($("#messageCard"), s.message);
   setText($("#countdownLabel"), s.countdown.label);
@@ -289,7 +290,7 @@ function tick() {
 /* ---------- decoration ---------- */
 
 function plantLeaves() {
-  const colours = ["--c-yellow", "--c-orange-mid", "--c-gold", "--c-orange-bright", "--c-butter"];
+  const colours = ["--c-paper", "--c-sky", "--c-red", "--c-tint", "--c-red-soft"];
   const layer = $("#leaves");
   for (let i = 0; i < 18; i++) {
     const leaf = document.createElement("i");
@@ -347,7 +348,7 @@ function placeStickers(stickers: string[]) {
 }
 
 // The mascot pops up somewhere new each time.
-const mascot = $("#mascot");
+const mascot = $<HTMLImageElement>("#mascot");
 mascot.addEventListener("animationiteration", () => {
   mascot.style.left = `${pick([rand(18, 30), rand(58, 68)])}%`;
 });

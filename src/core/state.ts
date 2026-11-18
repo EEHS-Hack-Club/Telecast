@@ -123,7 +123,7 @@ export function restoreState(defaults: Content, saved: unknown): State {
   const a = obj(s.alert);
   if (typeof a.id === "string") {
     state.alert = {
-      ...card(a, { kicker: "", title: "", body: "", tone: "orange" }),
+      ...card(a, { kicker: "", title: "", body: "", tone: "red" }),
       id: a.id.slice(0, 32),
       startedAt: num(a.startedAt, 0, 8.64e15, Date.now()),
       expiresAt: typeof a.expiresAt === "number" ? a.expiresAt : null,
@@ -144,7 +144,7 @@ export function newAlert(raw: unknown, id: string, now: number): Alert | null {
     kicker: str(v.kicker, 60, "Announcement"),
     title,
     body,
-    tone: tone(v.tone, "orange"),
+    tone: tone(v.tone, "red"),
     startedAt: now,
     expiresAt: seconds ? now + seconds * 1000 : null,
   };

@@ -1,7 +1,8 @@
 # Telecast
 
 Live screens for an event venue, with a control panel for the organisers. Built for
-[Haven London](https://haven.london); made so other events can run their own.
+[Haven London](https://haven.london); made so other events can run their own. This copy is set up
+for [EEHS Hack Club](https://eehshack.club).
 
 - `/` is the screen. Open it on each TV or projector and click once (or press F) to go full screen.
 - `/control` is the organisers' panel. Sign in with Hack Club; it works on a phone, and every change
@@ -85,9 +86,10 @@ Everything specific to an event is in two places:
 - **[`telecast.config.ts`](telecast.config.ts):** the event's name, time zone, sticker list and the
   content the screens start with (schedule, welcome line and so on).
 - **[`public/theme/`](public/theme):** `theme.css` (fonts, colours, backdrop), `logo.webp`,
-  `background.webp`, `mascot.webp` and `stickers/`. Replace the files and adjust the CSS variables.
+  `background.svg` and `stickers/`. Replace the files and adjust the CSS variables. Add a
+  `mascot.webp` and set `mascot: true` in the config to have one peek over the idle screen.
 
-The Haven London stickers are from [hackclub/site](https://github.com/hackclub/site/tree/main/public/assets).
+The stickers are from [hackclub/site](https://github.com/hackclub/site/tree/main/public/assets).
 
 ## Developing
 

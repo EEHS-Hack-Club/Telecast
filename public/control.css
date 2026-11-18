@@ -1,9 +1,9 @@
 /* The organisers' side: used on laptops and phones, so it's ordinary responsive sizing, not screen-scaled. */
 body {
   margin: 0;
-  background: var(--c-butter);
+  background: var(--c-tint);
   font-family: var(--font-body);
-  color: var(--c-bark);
+  color: var(--c-ink);
   font-size: 1rem;
 }
 
@@ -26,8 +26,8 @@ h2 {
   align-items: center;
   gap: 0.75rem 1.25rem;
   padding: 0.9rem clamp(1rem, 3vw, 2rem);
-  background: var(--c-orange-deep);
-  color: var(--c-cream);
+  background: var(--c-accent);
+  color: var(--c-paper);
 }
 
 .top h1 {
@@ -35,7 +35,7 @@ h2 {
 }
 
 .top h1 span {
-  color: var(--c-yellow);
+  color: var(--c-sky);
 }
 
 .status {
@@ -53,7 +53,7 @@ h2 {
   height: 0.6rem;
   margin-right: 0.45rem;
   border-radius: 50%;
-  background: var(--c-yellow);
+  background: var(--c-sky);
 }
 
 .status[data-state="live"]::before {
@@ -82,8 +82,8 @@ h2 {
 
 .top .button.ghost {
   background: transparent;
-  color: var(--c-cream);
-  border-color: var(--c-cream);
+  color: var(--c-paper);
+  border-color: var(--c-paper);
   box-shadow: none;
 }
 
@@ -117,10 +117,10 @@ h2 {
   display: grid;
   gap: 0.85rem;
   padding: 1.25rem;
-  background: var(--c-cream);
-  border: 0.2rem solid var(--c-bark);
+  background: var(--c-paper);
+  border: 0.2rem solid var(--c-ink);
   border-radius: 1.25rem;
-  box-shadow: 0 0.35rem 0 var(--c-brown-dark);
+  box-shadow: 0 0.35rem 0 var(--c-shadow);
 }
 
 .panel h2 {
@@ -136,17 +136,17 @@ h2 {
 }
 
 .panel.live {
-  border-color: var(--c-orange-deep);
-  box-shadow: 0 0.35rem 0 var(--c-orange-deep);
+  border-color: var(--c-accent);
+  box-shadow: 0 0.35rem 0 var(--c-accent);
 }
 
 .panel.live h2::after {
   content: "on screen";
   margin-left: 0.6rem;
   padding: 0.15rem 0.6rem;
-  background: var(--c-orange-deep);
+  background: var(--c-accent);
   border-radius: 999px;
-  color: var(--c-cream);
+  color: var(--c-paper);
   font-family: var(--font-body);
   font-size: 0.8rem;
   letter-spacing: 0.04em;
@@ -173,7 +173,7 @@ select {
   min-width: 0;
   padding: 0.6rem 0.75rem;
   background: #fff;
-  border: 0.125rem solid var(--c-brown-light);
+  border: 0.125rem solid var(--c-line);
   border-radius: 0.7rem;
   font: inherit;
   font-size: 1rem;
@@ -185,7 +185,7 @@ textarea {
 }
 
 :is(input, textarea, select, button, a):focus-visible {
-  outline: 0.2rem solid var(--c-orange-deep);
+  outline: 0.2rem solid var(--c-accent);
   outline-offset: 0.125rem;
 }
 
@@ -201,7 +201,7 @@ textarea {
   width: 1.2rem;
   height: 1.2rem;
   flex: none;
-  accent-color: var(--c-orange-deep);
+  accent-color: var(--c-accent);
 }
 
 .row {
@@ -262,12 +262,12 @@ legend {
 }
 
 .tones input:checked + span {
-  border-color: var(--c-bark);
-  box-shadow: 0 0 0 0.15rem var(--c-cream) inset;
+  border-color: var(--c-ink);
+  box-shadow: 0 0 0 0.15rem var(--c-paper) inset;
 }
 
 .tones input:focus-visible + span {
-  outline: 0.2rem solid var(--c-orange-deep);
+  outline: 0.2rem solid var(--c-accent);
   outline-offset: 0.125rem;
 }
 
@@ -281,11 +281,11 @@ legend {
 .button {
   display: inline-block;
   padding: 0.6rem 1.2rem;
-  background: var(--c-orange-deep);
-  border: 0.15rem solid var(--c-bark);
+  background: var(--c-accent);
+  border: 0.15rem solid var(--c-ink);
   border-radius: 999px;
-  box-shadow: 0 0.2rem 0 var(--c-bark);
-  color: var(--c-cream);
+  box-shadow: 0 0.2rem 0 var(--c-ink);
+  color: var(--c-paper);
   font: inherit;
   font-size: 1rem;
   text-decoration: none;
@@ -295,12 +295,12 @@ legend {
 
 .button:active {
   transform: translateY(0.15rem);
-  box-shadow: 0 0.05rem 0 var(--c-bark);
+  box-shadow: 0 0.05rem 0 var(--c-ink);
 }
 
 .button.ghost {
   background: #fff;
-  color: var(--c-bark);
+  color: var(--c-ink);
 }
 
 .button.small {
@@ -315,7 +315,7 @@ legend {
 }
 
 form[data-dirty] .button[type="submit"]:not(.ghost) {
-  background: var(--c-green-dark);
+  background: var(--c-red);
 }
 
 /* ---------- preview + scene switcher ---------- */
@@ -348,7 +348,7 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
 .scenes button {
   padding: 0.75rem 0.4rem;
   background: #fff;
-  border: 0.15rem solid var(--c-brown-light);
+  border: 0.15rem solid var(--c-line);
   border-radius: 0.8rem;
   font: inherit;
   font-size: 1rem;
@@ -357,10 +357,10 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
 }
 
 .scenes button[aria-pressed="true"] {
-  background: var(--c-orange-deep);
-  border-color: var(--c-bark);
-  box-shadow: 0 0.2rem 0 var(--c-bark);
-  color: var(--c-cream);
+  background: var(--c-accent);
+  border-color: var(--c-ink);
+  box-shadow: 0 0.2rem 0 var(--c-ink);
+  color: var(--c-paper);
 }
 
 /* ---------- countdown + schedule editors ---------- */
@@ -375,8 +375,8 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
 
 .quick button {
   padding: 0.35rem 0.8rem;
-  background: var(--c-butter);
-  border: 0.125rem solid var(--c-brown-light);
+  background: var(--c-tint);
+  border: 0.125rem solid var(--c-line);
   border-radius: 999px;
   font: inherit;
   color: inherit;
@@ -412,7 +412,7 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
   border-radius: 0.6rem;
   font-size: 1.4rem;
   line-height: 1;
-  color: var(--c-orange-deep);
+  color: var(--c-accent);
   cursor: pointer;
 }
 
@@ -443,7 +443,7 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: rgb(107 52 20 / 0.7);
+  background: rgb(3 20 80 / 0.7);
   backdrop-filter: blur(0.4rem);
 }
 
@@ -465,7 +465,7 @@ form[data-dirty] .button[type="submit"]:not(.ghost) {
   padding: 0.6rem 1.2rem;
   background: var(--c-night);
   border-radius: 999px;
-  color: var(--c-cream);
+  color: var(--c-paper);
   translate: -50% 0;
   white-space: nowrap;
 }

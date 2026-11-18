@@ -9,25 +9,21 @@
   --font-body: "Jua", ui-rounded, system-ui, sans-serif;
   --font-board: "Doto", ui-monospace, monospace;
 
-  --c-green: #b8c220;
-  --c-green-deep: #97a01a;
-  --c-green-dark: #6f7612;
-  --c-orange-deep: #ed5615;
-  --c-orange-bright: #fa681b;
-  --c-orange-mid: #fc8616;
-  --c-yellow: #ffd059;
-  --c-butter: #ffe382;
-  --c-cream: #fff6dc;
-  --c-gold: #fba71f;
-  --c-brown-dark: #b8774a;
-  --c-brown-light: #dda47d;
-  --c-bark: #6b3414;
-  --c-teal: #2cbf90;
-  --c-night: #2a1a10;
-  --c-red: #d92b3a;
+  /* From the EEHS Hack Club logo: its blue, the deeper blue of the </> mark, white and the flag's red. */
+  --c-brand: #0070ff;
+  --c-accent: #0053ff;
+  --c-red: #ec3750;
+  --c-red-soft: #ff6b81;
+  --c-sky: #9cc7ff;
+  --c-tint: #d6e6ff;
+  --c-paper: #f4f8ff;
+  --c-line: #a9c4f5;
+  --c-shadow: #00247f;
+  --c-ink: #06174a;
+  --c-night: #030c2b;
 
   /* The picture behind every scene. */
-  --backdrop: url("/theme/background.webp");
+  --backdrop: url("/theme/background.svg");
 
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -39,28 +35,23 @@
 }
 
 /* Announcement colours, used by the message scene, flash announcements and the control panel swatches. */
-.tone-orange {
-  --card-bg: var(--c-orange-deep);
-  --card-fg: var(--c-cream);
-  --card-accent: var(--c-yellow);
-}
-.tone-green {
-  --card-bg: var(--c-green);
-  --card-fg: #3d2409;
-  --card-accent: var(--c-bark);
-}
-.tone-teal {
-  --card-bg: var(--c-teal);
-  --card-fg: #0f3327;
-  --card-accent: var(--c-cream);
-}
-.tone-yellow {
-  --card-bg: var(--c-butter);
-  --card-fg: var(--c-bark);
-  --card-accent: var(--c-orange-deep);
-}
 .tone-red {
   --card-bg: var(--c-red);
   --card-fg: #fff;
-  --card-accent: var(--c-yellow);
+  --card-accent: var(--c-ink);
+}
+.tone-blue {
+  --card-bg: var(--c-accent);
+  --card-fg: #fff;
+  --card-accent: var(--c-sky);
+}
+.tone-navy {
+  --card-bg: var(--c-ink);
+  --card-fg: var(--c-paper);
+  --card-accent: var(--c-red-soft);
+}
+.tone-white {
+  --card-bg: var(--c-paper);
+  --card-fg: var(--c-ink);
+  --card-accent: var(--c-accent);
 }
