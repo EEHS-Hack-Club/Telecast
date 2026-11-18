@@ -4,6 +4,9 @@ Live screens for an event venue, with a control panel for the organisers. Built 
 [Haven London](https://haven.london); made so other events can run their own. This copy is set up
 for [EEHS Hack Club](https://eehshack.club).
 
+Telecast was created by Jupiter for Haven London. Thank you for making it something other events
+can pick up and run!
+
 - `/` is the screen. Open it on each TV or projector and click once (or press F) to go full screen.
 - `/control` is the organisers' panel. Sign in with Hack Club; it works on a phone, and every change
   reaches every screen straight away.
